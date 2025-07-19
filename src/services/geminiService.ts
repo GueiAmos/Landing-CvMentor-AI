@@ -428,8 +428,14 @@ Réponds directement avec ton message d'introduction.
   async interviewChatWithGemini(
     chatHistory: Array<{ role: string; content: string }>, 
     jobOffer?: JobOffer,
-    questionCount?: number
+    questionCount?: number,
+    audioBlob?: Blob
   ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
+    // Si on a un blob audio, on l'utilise directement avec Gemini
+    if (audioBlob) {
+      return this.processAudioMessage(chatHistory, jobOffer, questionCount, audioBlob);
+    }
+
     const contextPrompt = `
 Tu es DRH AI, Directeur des Ressources Humaines expérimenté. Tu fais passer un entretien d'embauche pour :
 
@@ -489,6 +495,101 @@ ${(questionCount || 0) >= 6 ?
         shouldEnd: false
       };
     }
+  }
+
+  private async processAudioMessage(
+    chatHistory: Array<{ role: string; content: string }>,
+    jobOffer?: JobOffer,
+    questionCount?: number,
+    audioBlob?: Blob
+  ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
+    try {
+      // Convertir le blob audio en base64
+      const audioBase64 = await this.blobToBase64(audioBlob!);
+      
+      const contextPrompt = `
+Tu es DRH AI, Directeur des Ressources Humaines expérimenté. Tu fais passer un entretien d'embauche pour :
+
+${jobOffer ? `
+POSTE : ${jobOffer.title}
+ENTREPRISE : ${jobOffer.company}
+DESCRIPTION : ${jobOffer.description}
+` : 'Poste générique'}
+
+COMPORTEMENT REQUIS :
+- Tu es DRH AI, ferme et autoritaire comme un vrai directeur
+- Parle directement, sans détours
+- Impose le respect - si le candidat est irrespectueux, recadre-le fermement
+- Tu as l'autorité et le dernier mot
+- Évalue constamment le candidat
+- Pose des questions précises et pertinentes
+- L'entretien dure 6-8 échanges maximum
+- TU DÉCIDES quand l'entretien se termine
+
+GESTION DE L'IRRESPECT :
+Si le candidat :
+- Est irrespectueux ou familier
+- Répond de manière désinvolte
+- Manque de sérieux
+→ Recadre-le immédiatement avec fermeté
+
+FIN D'ENTRETIEN :
+Après 6-8 questions, termine par : "L'entretien est terminé. Vous recevrez un rapport détaillé."
+
+NOMBRE D'ÉCHANGES ACTUELS : ${questionCount || 0}
+
+Historique de la conversation :
+${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
+
+Le candidat vient de t'envoyer un message vocal. Écoute-le et réponds en conséquence.
+
+${(questionCount || 0) >= 6 ? 
+  'TERMINE L\'ENTRETIEN MAINTENANT avec "L\'entretien est terminé. Vous recevrez un rapport détaillé."' :
+  'Réponds en tant que DRH AI. Pose la question suivante ou recadre si nécessaire.'
+}
+`;
+
+      const result = await this.model.generateContent([
+        contextPrompt,
+        {
+          inlineData: {
+            data: audioBase64,
+            mimeType: 'audio/wav'
+          }
+        }
+      ]);
+      
+      const response = await result.response;
+      const text = response.text().trim();
+      
+      const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
+      
+      return {
+        response: text,
+        shouldEnd,
+        finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
+      };
+    } catch (error) {
+      console.error('Erreur traitement audio Gemini:', error);
+      return {
+        response: 'Je n\'ai pas pu comprendre votre message vocal. Pouvez-vous répéter ou écrire votre réponse ?',
+        shouldEnd: false
+      };
+    }
+  }
+
+  private async blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Retirer le préfixe data:audio/wav;base64,
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = () => reject(new Error('Erreur lors de la conversion audio'));
+      reader.readAsDataURL(blob);
+    });
   }
 
   async generateInterviewReport(

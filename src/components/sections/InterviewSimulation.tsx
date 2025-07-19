@@ -107,7 +107,7 @@ const InterviewSimulation: React.FC = () => {
   const [finalReport, setFinalReport] = useState<InterviewReport | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isProcessingAudio, setIsProcessingAudio] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
@@ -140,9 +140,12 @@ const InterviewSimulation: React.FC = () => {
   };
 
   // Envoi d'un message utilisateur
-  const sendMessage = async (message: string) => {
-    if (!message.trim()) return;
-    setChat((prev) => [...prev, { role: 'user', content: message }]);
+  const sendMessage = async (message: string, audioBlob?: Blob) => {
+    if (!message.trim() && !audioBlob) return;
+    
+    // Ajouter le message à l'historique (texte ou indication audio)
+    const displayMessage = audioBlob ? "🎤 Message vocal envoyé" : message;
+    setChat((prev) => [...prev, { role: 'user', content: displayMessage }]);
     setInput('');
     setIsLoading(true);
     setError('');
@@ -154,10 +157,13 @@ const InterviewSimulation: React.FC = () => {
       const session = getSession();
       const jobOffer = session.jobOffer;
       // Construit l'historique pour Gemini
-      const history = chat.map(m => ({ role: m.role, content: m.content }));
-      history.push({ role: 'user', content: message });
+      const history = chat.map(m => ({ 
+        role: m.role, 
+        content: m.content === "🎤 Message vocal envoyé" ? "[Message vocal]" : m.content 
+      }));
+      history.push({ role: 'user', content: audioBlob ? "[Message vocal]" : message });
       
-      const result = await aiService.interviewChatWithGemini(history, jobOffer, newQuestionCount);
+      const result = await aiService.interviewChatWithGemini(history, jobOffer, newQuestionCount, audioBlob);
       
       setChat((prev) => [...prev, { role: 'ia', content: result.response }]);
       
@@ -180,38 +186,17 @@ const InterviewSimulation: React.FC = () => {
     sendMessage(input);
   };
 
-  // Transcription audio vers texte (simulation)
-  const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
-    // Simulation de transcription - dans un vrai projet, utiliser une API de transcription
-    setIsTranscribing(true);
-    
-    // Simuler un délai de transcription
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsTranscribing(false);
-    
-    // Retourner un texte simulé basé sur la taille du blob
-    const responses = [
-      "Bonjour, je suis très motivé pour ce poste et j'aimerais vous expliquer pourquoi je serais un bon candidat.",
-      "J'ai une expérience de trois ans dans ce domaine et je pense pouvoir apporter beaucoup à votre équipe.",
-      "Pouvez-vous me parler davantage des responsabilités de ce poste ?",
-      "Je suis passionné par ce secteur et j'ai développé des compétences qui correspondent à vos besoins.",
-      "Comment voyez-vous l'évolution de ce poste dans les prochaines années ?"
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
-
   // Gestion de l'enregistrement vocal
   const handleRecordingComplete = async (audioBlob: Blob) => {
+    setIsProcessingAudio(true);
     try {
-      const transcribedText = await transcribeAudio(audioBlob);
-      setInput(transcribedText);
-      // Optionnel : envoyer automatiquement après transcription
-      // sendMessage(transcribedText);
+      // Envoyer directement l'audio à Gemini
+      await sendMessage("", audioBlob);
     } catch (error) {
-      console.error('Erreur lors de la transcription:', error);
-      setError('Erreur lors de la transcription audio.');
+      console.error('Erreur lors du traitement audio:', error);
+      setError('Erreur lors du traitement du message vocal.');
+    } finally {
+      setIsProcessingAudio(false);
     }
   };
 
@@ -244,7 +229,7 @@ const InterviewSimulation: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">DRH IA - Entretien Live</h1>
           <p className="text-gray-700 mb-6">
             Échangez avec notre DRH IA par <strong>écrit</strong> ou par <strong>note vocale</strong>. 
-            L'entretien est basé sur l\'offre d\'emploi que vous avez comparée à votre CV.
+            L'entretien est basé sur l'offre d'emploi que vous avez comparée à votre CV.
           </p>
           <div className="bg-blue-50 rounded-xl p-6 mb-8">
             <h3 className="font-semibold text-blue-900 mb-3">Fonctionnalités disponibles :</h3>
@@ -255,11 +240,11 @@ const InterviewSimulation: React.FC = () => {
               </div>
               <div className="flex items-center">
                 <Mic className="h-4 w-4 text-blue-600 mr-2" />
-                <span>Notes vocales</span>
+                <span>Messages vocaux directs</span>
               </div>
               <div className="flex items-center">
-                <Volume2 className="h-4 w-4 text-blue-600 mr-2" />
-                <span>Transcription automatique</span>
+                <Brain className="h-4 w-4 text-blue-600 mr-2" />
+                <span>Traitement IA de l'audio</span>
               </div>
               <div className="flex items-center">
                 <Loader2 className="h-4 w-4 text-blue-600 mr-2" />
@@ -312,10 +297,10 @@ const InterviewSimulation: React.FC = () => {
           onStartRecording={handleStartRecording}
           onStopRecording={handleStopRecording}
         />
-        {isTranscribing && (
+        {isProcessingAudio && (
           <div className="flex items-center text-blue-600 text-sm">
             <Loader2 className="animate-spin h-4 w-4 mr-1" />
-            Transcription...
+            Traitement audio...
           </div>
         )}
         <input

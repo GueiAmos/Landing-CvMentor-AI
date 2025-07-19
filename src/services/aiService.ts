@@ -384,11 +384,12 @@ Pour commencer, pourriez-vous vous présenter en quelques minutes et me parler d
   async interviewChatWithGemini(
     chatHistory: Array<{ role: string; content: string }>, 
     jobOffer?: JobOffer,
-    questionCount?: number
+    questionCount?: number,
+    audioBlob?: Blob
   ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
     if (this.useRealAPI) {
       try {
-        return await geminiService.interviewChatWithGemini(chatHistory, jobOffer, questionCount);
+        return await geminiService.interviewChatWithGemini(chatHistory, jobOffer, questionCount, audioBlob);
       } catch (error) {
         console.warn('Fallback vers réponse simulée:', error);
       }
