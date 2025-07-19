@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Mic, Send, Loader2, ArrowLeft, MicOff, Volume2 } from 'lucide-react';
+import { MessageCircle, Mic, Send, Loader2, ArrowLeft, MicOff, Volume2, Brain } from 'lucide-react';
 import { aiService } from '../../services/aiService';
 import { getSession } from '../../utils/storage';
 import LoadingSpinner from '../ui/LoadingSpinner';
