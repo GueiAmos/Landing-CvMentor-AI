@@ -6,7 +6,7 @@ import { convertPDFToBase64, validatePDFFile } from '../../utils/pdfReader';
 import { CVAnalysis } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
-import CVPreview from '../ui/CVPreview';
+import CVPreview from '../ui/CVPreview.tsx';
 import ScoreGauge from '../ui/ScoreGauge';
 import ProgressBar from '../ui/ProgressBar';
 
