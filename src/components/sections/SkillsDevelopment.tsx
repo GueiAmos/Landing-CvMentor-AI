@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, BookOpen, Clock, Star, ExternalLink, Target, Award } from 'lucide-react';
+import { TrendingUp, BookOpen, Clock, Star, ExternalLink, Target, Award, Play, RefreshCw } from 'lucide-react';
 import { aiService } from '../../services/aiService';
+import { youtubeService } from '../../services/youtubeService';
 import { saveSession, getSession } from '../../utils/storage';
 import { SkillGap, Resource } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
+import YouTubePlayer from '../ui/YouTubePlayer';
+
+interface YouTubeVideo {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  channelTitle: string;
+  duration: string;
+  viewCount: string;
+  publishedAt: string;
+  url: string;
+}
 
 const SkillsDevelopment: React.FC = () => {
   const [skillGaps, setSkillGaps] = useState<SkillGap[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [selectedSkill, setSelectedSkill] = useState<SkillGap | null>(null);
+  const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<YouTubeVideo | null>(null);
 
   useEffect(() => {
     const session = getSession();
@@ -22,6 +39,38 @@ const SkillsDevelopment: React.FC = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (selectedSkill) {
+      loadYouTubeVideos(selectedSkill.skill);
+    }
+  }, [selectedSkill]);
+
+  const loadYouTubeVideos = async (skill: string) => {
+    setIsLoadingVideos(true);
+    try {
+      const videos = await youtubeService.searchVideos(skill);
+      setYoutubeVideos(videos);
+    } catch (error) {
+      console.error('Erreur chargement vidéos YouTube:', error);
+    } finally {
+      setIsLoadingVideos(false);
+    }
+  };
+
+  const refreshVideos = () => {
+    if (selectedSkill) {
+      loadYouTubeVideos(selectedSkill.skill);
+    }
+  };
+
+  const playVideo = (video: YouTubeVideo) => {
+    setSelectedVideo(video);
+  };
+
+  const closeVideo = () => {
+    setSelectedVideo(null);
+  };
 
   const generateSkillPlan = async (gaps?: string[]) => {
     const session = getSession();
@@ -214,40 +263,61 @@ const SkillsDevelopment: React.FC = () => {
                 </div>
 
                 <h4 className="font-semibold text-gray-900 mb-4">Ressources de Formation</h4>
-                <div className="space-y-3">
-                  {selectedSkill.resources.map((resource, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h5 className="font-medium text-gray-900 text-sm">{resource.title}</h5>
-                        <div className="flex items-center text-blue-600">
-                          {getTypeIcon(resource.type)}
-                        </div>
-                      </div>
-                      
-                      {resource.description && (
-                        <p className="text-xs text-gray-600 mb-2">{resource.description}</p>
-                      )}
-                      
-                      <div className="flex items-center justify-between mb-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(resource.difficulty)}`}>
-                          {resource.difficulty}
-                        </span>
-                        {resource.duration && (
-                          <span className="text-xs text-gray-500">{resource.duration}</span>
-                        )}
-                      </div>
-                      
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-                      >
-                        Accéder à la ressource
-                        <ExternalLink className="h-3 w-3 ml-1" />
-                      </a>
+                
+                {/* Vidéos YouTube */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h5 className="font-medium text-gray-900">Vidéos de formation</h5>
+                    <button
+                      onClick={refreshVideos}
+                      disabled={isLoadingVideos}
+                      className="flex items-center px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
+                    >
+                      <RefreshCw className={`h-3 w-3 mr-1 ${isLoadingVideos ? 'animate-spin' : ''}`} />
+                      Recharger
+                    </button>
+                  </div>
+                  
+                  {isLoadingVideos ? (
+                    <div className="text-center py-4">
+                      <div className="w-6 h-6 border-2 border-red-200 border-t-red-600 rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-xs text-gray-600">Recherche de vidéos...</p>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {youtubeVideos.map((video) => (
+                        <div key={video.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                          <div className="flex items-start space-x-3">
+                            <img
+                              src={video.thumbnail}
+                              alt={video.title}
+                              className="w-16 h-12 object-cover rounded flex-shrink-0"
+                            />
+                            <div className="flex-grow min-w-0">
+                              <h6 className="font-medium text-gray-900 text-sm line-clamp-2 mb-1">
+                                {video.title}
+                              </h6>
+                              <p className="text-xs text-gray-600 mb-2">{video.channelTitle}</p>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2 text-xs text-gray-500">
+                                  <span>{video.duration}</span>
+                                  <span>•</span>
+                                  <span>{video.viewCount}</span>
+                                </div>
+                                <button
+                                  onClick={() => playVideo(video)}
+                                  className="flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                                >
+                                  <Play className="h-3 w-3 mr-1" />
+                                  Regarder
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -261,6 +331,15 @@ const SkillsDevelopment: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* YouTube Player Modal */}
+      {selectedVideo && (
+        <YouTubePlayer
+          videoId={selectedVideo.id}
+          title={selectedVideo.title}
+          onClose={closeVideo}
+        />
+      )}
 
       {/* Conseils Généraux */}
       <div className="mt-8 bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl p-6">

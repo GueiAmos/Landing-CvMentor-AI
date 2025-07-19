@@ -7,6 +7,7 @@ import { CVAnalysis } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import MarkdownRenderer from '../ui/MarkdownRenderer';
 import CVPreview from '../ui/CVPreview.tsx';
+import PDFViewer from '../ui/PDFViewer';
 import ScoreGauge from '../ui/ScoreGauge';
 import ProgressBar from '../ui/ProgressBar';
 
@@ -129,8 +130,30 @@ const CVAnalysisComponent: React.FC = () => {
                analysis.globalScore >= 4 ? 'CV correct mais des améliorations sont nécessaires.' :
                'CV à retravailler pour optimiser vos chances.'}
             </p>
+            
+            {/* Bouton pour voir le CV */}
+            <div className="mt-6">
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+              >
+                {showPreview ? 'Masquer le CV' : 'Voir le CV analysé'}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Prévisualisation du CV */}
+        {showPreview && (
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4">Votre CV analysé</h3>
+            {uploadedFile && uploadedFile.type === 'application/pdf' ? (
+              <PDFViewer file={uploadedFile} />
+            ) : (
+              <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
+            )}
+          </div>
+        )}
 
         {/* Scores Détaillés */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -191,23 +214,6 @@ const CVAnalysisComponent: React.FC = () => {
               ))}
             </ul>
           </div>
-        </div>
-
-        {/* Prévisualisation du CV */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-gray-900">Votre CV analysé</h3>
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-            >
-              {showPreview ? 'Masquer le CV' : 'Voir le CV complet'}
-            </button>
-          </div>
-          
-          {showPreview && (
-            <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
-          )}
         </div>
 
         {/* Mots-clés Manquants */}

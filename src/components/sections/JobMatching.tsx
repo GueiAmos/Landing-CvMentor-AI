@@ -164,13 +164,13 @@ const JobMatching: React.FC = () => {
           <div className="bg-red-50 rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-4">
               <AlertCircle className="h-6 w-6 text-red-600 mr-2" />
-              <h3 className="text-xl font-semibold text-red-900">Lacunes Identifiées</h3>
+              <h3 className="text-xl font-semibold text-red-900">Compétences Manquantes pour ce Poste</h3>
             </div>
             <div className="space-y-2">
               {matchResult.gaps.map((gap, index) => (
                 <div key={index} className="flex items-center bg-red-100 rounded-lg p-3">
                   <TrendingUp className="h-4 w-4 text-red-600 mr-2" />
-                  <MarkdownRenderer content={gap} className="text-red-800 font-medium" />
+                  <MarkdownRenderer content={`**${gap}** - Compétence recherchée par l'employeur`} className="text-red-800 font-medium" />
                 </div>
               ))}
             </div>

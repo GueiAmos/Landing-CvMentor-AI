@@ -143,14 +143,14 @@ Fournissez une analyse au format JSON avec cette structure exacte :
 {
   "compatibilityRate": number (pourcentage entre 0 et 100),
   "alignedSkills": [array des compétences du candidat qui correspondent],
-  "gaps": [array des compétences/expériences manquantes importantes],
+  "gaps": [array des compétences manquantes spécifiquement pour ce poste],
   "adaptationTips": [array de 4-5 conseils pour améliorer la candidature]
 }
 
 Analysez :
 1. La correspondance entre les compétences du CV et celles requises
 2. L'adéquation de l'expérience avec le poste
-3. Les lacunes critiques à combler
+3. Les compétences manquantes spécifiquement demandées par l'employeur
 4. Les points forts à mettre en avant
 
 IMPORTANT :
@@ -158,6 +158,7 @@ IMPORTANT :
 - Mettez les éléments importants entre **double astérisques** pour les mettre en gras
 - Donnez des conseils pratiques et facilement applicables
 - Adaptez au marché de l'emploi africain
+- Pour les gaps, listez uniquement les compétences que l'employeur recherche mais qui manquent au candidat
 `;
 
     try {
