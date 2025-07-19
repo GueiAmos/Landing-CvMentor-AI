@@ -35,8 +35,7 @@ const CVPreview: React.FC<CVPreviewProps> = ({ cvText, uploadedFile }) => {
               Document PDF analysé
             </h3>
             <p className="text-gray-600 mb-4">
-              Votre CV PDF a été analysé avec succès. Le contenu a été extrait 
-              et traité par notre intelligence artificielle.
+              Votre CV PDF a été analysé avec succès.
             </p>
             <div className="bg-blue-50 rounded-lg p-4 text-left">
               <h4 className="font-medium text-blue-900 mb-2">Informations du fichier :</h4>
@@ -47,11 +46,20 @@ const CVPreview: React.FC<CVPreviewProps> = ({ cvText, uploadedFile }) => {
                 <li>• Statut : Analysé avec succès</li>
               </ul>
             </div>
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg text-left">
+              <h4 className="font-medium text-gray-900 mb-2">Contenu du CV :</h4>
+              <div className="max-h-96 overflow-y-auto">
+                <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800 leading-relaxed">
+                  {cvText && !cvText.startsWith('[PDF analysé:') ? cvText : 'Le contenu du PDF a été extrait et analysé par notre IA.'}
+                </pre>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="max-h-96 overflow-y-auto">
             <div className="prose max-w-none">
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <h4 className="font-medium text-gray-900 mb-3">Contenu de votre CV :</h4>
                 <pre className="whitespace-pre-wrap font-sans text-sm text-gray-800 leading-relaxed">
                   {cvText}
                 </pre>

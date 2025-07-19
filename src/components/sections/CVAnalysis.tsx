@@ -166,18 +166,7 @@ const CVAnalysisComponent: React.FC = () => {
             <div className="flex items-center mb-4">
               <CheckCircle className="h-6 w-6 text-green-600 mr-2" />
               <h3 className="text-xl font-semibold text-green-900">Points Forts</h3>
-              <button
-                onClick={() => setShowPreview(!showPreview)}
-                className="ml-auto text-blue-600 hover:text-blue-700 text-sm"
-              >
-                {showPreview ? 'Masquer' : 'Voir'} le CV
-              </button>
             </div>
-            {showPreview && (
-              <div className="mb-4">
-                <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
-              </div>
-            )}
             <ul className="space-y-3">
               {analysis.strengths.map((strength, index) => (
                 <li key={index} className="flex items-start">
@@ -202,6 +191,23 @@ const CVAnalysisComponent: React.FC = () => {
               ))}
             </ul>
           </div>
+        </div>
+
+        {/* Prévisualisation du CV */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-gray-900">Votre CV analysé</h3>
+            <button
+              onClick={() => setShowPreview(!showPreview)}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              {showPreview ? 'Masquer le CV' : 'Voir le CV complet'}
+            </button>
+          </div>
+          
+          {showPreview && (
+            <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
+          )}
         </div>
 
         {/* Mots-clés Manquants */}
