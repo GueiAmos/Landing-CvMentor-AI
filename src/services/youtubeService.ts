@@ -8,6 +8,7 @@ interface YouTubeSearchResponse {
       description: string;
       thumbnails: {
         medium: { url: string };
+        high: { url: string };
       };
       channelTitle: string;
       publishedAt: string;
@@ -63,7 +64,7 @@ class YouTubeService {
 
   async searchVideos(skill: string, maxResults: number = 6): Promise<YouTubeSearchResult> {
     if (!this.apiKey) {
-      console.warn('YouTube API key not configured');
+      console.warn('YouTube API key not configured, using mock data');
       return {
         videos: this.getMockVideos(skill),
         language: 'mock'
@@ -71,12 +72,30 @@ class YouTubeService {
     }
 
     try {
-      // Recherche de vidéos
-      const searchQuery = `${skill} formation tutoriel cours`;
-      const searchUrl = `${this.baseUrl}/search?part=snippet&q=${encodeURIComponent(searchQuery)}&type=video&maxResults=${maxResults}&key=${this.apiKey}&relevanceLanguage=fr&regionCode=FR`;
+      // Recherche en français d'abord
+      let searchQuery = `${skill} formation tutoriel cours français`;
+      let searchUrl = `${this.baseUrl}/search?part=snippet&q=${encodeURIComponent(searchQuery)}&type=video&maxResults=${maxResults}&key=${this.apiKey}&relevanceLanguage=fr&regionCode=FR&order=relevance`;
       
-      const searchResponse = await fetch(searchUrl);
-      const searchData: YouTubeSearchResponse = await searchResponse.json();
+      let searchResponse = await fetch(searchUrl);
+      
+      if (!searchResponse.ok) {
+        throw new Error(`YouTube API Error: ${searchResponse.status} ${searchResponse.statusText}`);
+      }
+      
+      let searchData: YouTubeSearchResponse = await searchResponse.json();
+
+      // Si pas assez de résultats en français, essayer en anglais
+      let language: 'fr' | 'en' | 'mock' = 'fr';
+      if (!searchData.items || searchData.items.length < 3) {
+        searchQuery = `${skill} tutorial course training`;
+        searchUrl = `${this.baseUrl}/search?part=snippet&q=${encodeURIComponent(searchQuery)}&type=video&maxResults=${maxResults}&key=${this.apiKey}&relevanceLanguage=en&regionCode=US&order=relevance`;
+        
+        searchResponse = await fetch(searchUrl);
+        if (searchResponse.ok) {
+          searchData = await searchResponse.json();
+          language = 'en';
+        }
+      }
 
       if (!searchData.items || searchData.items.length === 0) {
         return {
@@ -90,16 +109,20 @@ class YouTubeService {
       const detailsUrl = `${this.baseUrl}/videos?part=contentDetails,statistics&id=${videoIds}&key=${this.apiKey}`;
       
       const detailsResponse = await fetch(detailsUrl);
-      const detailsData: YouTubeVideoDetailsResponse = await detailsResponse.json();
+      let detailsData: YouTubeVideoDetailsResponse = { items: [] };
+      
+      if (detailsResponse.ok) {
+        detailsData = await detailsResponse.json();
+      }
 
       // Combiner les données
-      const videos = searchData.items.map((item, index) => {
+      const videos: YouTubeVideo[] = searchData.items.map((item, index) => {
         const details = detailsData.items[index];
         return {
           id: item.id.videoId,
           title: item.snippet.title,
           description: item.snippet.description,
-          thumbnail: item.snippet.thumbnails.medium.url,
+          thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium.url,
           channelTitle: item.snippet.channelTitle,
           duration: details ? this.formatDuration(details.contentDetails.duration) : 'N/A',
           viewCount: details ? this.formatViewCount(details.statistics.viewCount) : 'N/A',
@@ -110,7 +133,7 @@ class YouTubeService {
 
       return {
         videos,
-        language: 'fr'
+        language
       };
 
     } catch (error) {
@@ -155,6 +178,28 @@ class YouTubeService {
         duration: '28min',
         viewCount: '67K vues',
         publishedAt: '2024-01-28',
+        url: '#'
+      },
+      {
+        id: 'mock4',
+        title: `${skill} - Projets pratiques`,
+        description: `Mettez en pratique vos connaissances en ${skill} avec des projets concrets.`,
+        thumbnail: 'https://images.pexels.com/photos/1181673/pexels-photo-1181673.jpeg?auto=compress&cs=tinysrgb&w=300',
+        channelTitle: 'Pratique Pro',
+        duration: '52min',
+        viewCount: '156K vues',
+        publishedAt: '2024-02-10',
+        url: '#'
+      },
+      {
+        id: 'mock5',
+        title: `Certification ${skill}`,
+        description: `Préparez-vous aux certifications professionnelles en ${skill}.`,
+        thumbnail: 'https://images.pexels.com/photos/1181679/pexels-photo-1181679.jpeg?auto=compress&cs=tinysrgb&w=300',
+        channelTitle: 'Certification Expert',
+        duration: '38min',
+        viewCount: '203K vues',
+        publishedAt: '2024-01-20',
         url: '#'
       }
     ];
