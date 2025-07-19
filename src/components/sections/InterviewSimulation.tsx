@@ -244,7 +244,7 @@ const InterviewSimulation: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">DRH IA - Entretien Live</h1>
           <p className="text-gray-700 mb-6">
             Échangez avec notre DRH IA par <strong>écrit</strong> ou par <strong>note vocale</strong>. 
-            L'entretien est basé sur l'offre d'emploi que vous avez comparée à votre CV.
+            L'entretien est basé sur l\'offre d'emploi que vous avez comparée à votre CV.
           </p>
           <div className="bg-blue-50 rounded-xl p-6 mb-8">
             <h3 className="font-semibold text-blue-900 mb-3">Fonctionnalités disponibles :</h3>
@@ -303,20 +303,16 @@ const InterviewSimulation: React.FC = () => {
         {isLoading && (
           <div className="flex justify-center items-center mt-4 text-blue-600"><Loader2 className="animate-spin mr-2" /> L'IA réfléchit…</div>
         )}
-        {isTranscribing && (
-          <div className="flex justify-center items-center mt-4 text-orange-600">
-            <Loader2 className="animate-spin mr-2" /> Transcription en cours...
-          </div>
-        )}
         <div ref={chatBottomRef} />
       </div>
       <div className="flex items-center gap-2 mt-auto">
-        <VoiceRecorder
-          onRecordingComplete={handleRecordingComplete}
-          isRecording={isRecording}
-          onStartRecording={handleStartRecording}
-          onStopRecording={handleStopRecording}
-        />
+        <button
+          onClick={handleMic}
+          className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full text-blue-600"
+          aria-label="Répondre par la voix"
+        >
+          <Mic className="h-5 w-5" />
+        </button>
         <input
           ref={inputRef}
           type="text"
@@ -324,13 +320,13 @@ const InterviewSimulation: React.FC = () => {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
           className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-          placeholder={isRecording ? "🎤 Enregistrement en cours..." : isTranscribing ? "Transcription..." : "Votre réponse ou utilisez le micro..."}
-          disabled={isLoading || interviewEnded || isRecording || isTranscribing}
+          placeholder="Votre réponse…"
+          disabled={isLoading || interviewEnded}
         />
         <button
           onClick={handleSend}
           className="p-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full ml-1"
-          disabled={isLoading || !input.trim() || interviewEnded || isRecording || isTranscribing}
+          disabled={isLoading || !input.trim() || interviewEnded}
           aria-label="Envoyer"
         >
           <Send className="h-5 w-5" />
@@ -338,14 +334,7 @@ const InterviewSimulation: React.FC = () => {
       </div>
       {interviewEnded && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
-          <p className="text-blue-800 font-medium">L'entretien avec le DRH IA est terminé. Génération du rapport en cours...</p>
-        </div>
-      )}
-      {(isRecording || isTranscribing) && (
-        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-center">
-          <p className="text-orange-800 font-medium">
-            {isRecording ? "🎤 Enregistrement en cours... Cliquez sur le micro pour arrêter" : "🔄 Transcription de votre message vocal..."}
-          </p>
+          <p className="text-blue-800 font-medium">L'entretien est terminé. Génération du rapport en cours...</p>
         </div>
       )}
       {error && <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800">{error}</div>}
