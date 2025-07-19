@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   currentSection: string;
@@ -27,11 +27,11 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
             className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => onNavigate('home')}
           >
-            <Brain className="h-8 w-8 text-blue-600 mr-2" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">CvMentor AI</h1>
-              <p className="text-xs text-gray-500">Optimisez votre candidature</p>
-            </div>
+            <img 
+              src="/logo2-transparent.png" 
+              alt="CvMentor AI" 
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Desktop Navigation */}
