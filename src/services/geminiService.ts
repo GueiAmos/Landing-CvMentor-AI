@@ -239,14 +239,17 @@ Répondez uniquement avec le contenu de la lettre, sans commentaires additionnel
 
   async generateInterviewQuestions(jobOffer: JobOffer, difficulty: string): Promise<InterviewQuestion[]> {
     const prompt = `
-Générez 8 questions d'entretien pour ce poste, adaptées au marché de l'emploi africain :
+Tu es un DRH expérimenté du secteur concerné par l'offre ci-dessous. Génère 8 questions d'entretien réalistes et variées pour ce poste, adaptées au marché de l'emploi africain et au niveau d'expérience demandé.
 
-Poste : ${jobOffer.title}
+Offre d'emploi :
+Titre : ${jobOffer.title}
 Entreprise : ${jobOffer.company}
 Description : ${jobOffer.description}
 Niveau de difficulté : ${difficulty}
 
-Fournissez un JSON avec cette structure :
+Pour chaque question, précise le type (general, behavioral, technical) et adapte le contenu au contexte du poste (missions, compétences, exigences, secteur).
+
+Fournis un JSON avec cette structure :
 {
   "questions": [
     {
@@ -259,14 +262,15 @@ Fournissez un JSON avec cette structure :
 }
 
 Répartition souhaitée :
-- 3 questions générales (présentation, motivation, projet professionnel)
-- 3 questions comportementales (situations, défis, travail en équipe)
-- 2 questions techniques (compétences, méthodes de travail)
+- 3 questions générales (présentation, motivation, projet professionnel, adaptées au poste)
+- 3 questions comportementales (situations, défis, travail en équipe, adaptées au secteur)
+- 2 questions techniques (compétences, méthodes de travail, adaptées à l'offre)
 
 IMPORTANT :
-- Utilisez un vocabulaire simple et accessible
-- Formulez des questions claires et faciles à comprendre
-- Adaptez au contexte africain et au secteur d'activité
+- Utilise un vocabulaire simple et accessible
+- Formule des questions claires, réalistes et contextualisées
+- Adapte chaque question au secteur et au poste
+- Ne pose pas de questions hors sujet
 `;
 
     try {

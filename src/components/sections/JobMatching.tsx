@@ -424,10 +424,10 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                   return <div className="text-xs text-orange-600">Aucune compétence commune détectée entre votre CV et l'offre.</div>;
                 }
                 return aligned.map((skill, index) => (
-                  <div key={index} className="flex items-center bg-green-100 rounded-lg p-3">
-                    <Target className="h-4 w-4 text-green-600 mr-2" />
+                <div key={index} className="flex items-center bg-green-100 rounded-lg p-3">
+                  <Target className="h-4 w-4 text-green-600 mr-2" />
                     <MarkdownRenderer content={skill} className="text-green-800 font-medium text-sm" />
-                  </div>
+                </div>
                 ));
               })()}
             </div>

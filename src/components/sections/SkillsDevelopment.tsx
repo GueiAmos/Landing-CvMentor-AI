@@ -150,7 +150,7 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
   };
 
   // Mobile-first header sticky
-  return (
+    return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 pb-8">
       <header className="sticky top-0 z-20 bg-white/90 backdrop-blur shadow-sm flex items-center px-2 sm:px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100">
         <button
@@ -226,13 +226,13 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                       {isLoadingVideos && loadingSkill === skill.skill ? (
                         <div className="text-center py-4">
                           <LoadingSpinner size="md" text="Chargement des vidéos..." />
-                        </div>
+                  </div>
                       ) : youtubeVideos[skill.skill] && youtubeVideos[skill.skill].length > 0 ? (
                         <>
                           <div className="relative">
                             <div className="flex items-center">
                               {/* Flèche gauche */}
-                              <button
+                    <button
                                 className="z-10 p-2 bg-white rounded-full shadow absolute left-0 top-1/2 -translate-y-1/2 border border-gray-200 hover:bg-blue-100"
                                 style={{ left: '-18px' }}
                                 onClick={() => {
@@ -242,7 +242,7 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                                 tabIndex={-1}
                               >
                                 <ChevronLeft className="h-5 w-5" />
-                              </button>
+                    </button>
                               {/* Carrousel vidéos */}
                               <div
                                 id={`carousel-${idx}`}
@@ -269,7 +269,7 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                                     >
                                       <ExternalLink className="h-3 w-3 mr-1" /> Regarder
                                     </a>
-                                  </div>
+                                </div>
                                 ))}
                               </div>
                               {/* Flèche droite */}
@@ -293,7 +293,7 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                             >
                               <RefreshCw className="h-4 w-4 mr-2" /> Recharger d'autres vidéos
                             </button>
-                          </div>
+                        </div>
                           {videoLang[skill.skill] === 'en' && (
                             <div className="text-center text-xs text-orange-600 mt-2">Aucune vidéo trouvée en français, voici des vidéos en anglais.</div>
                           )}
@@ -305,7 +305,7 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                   )}
                 </div>
               ))}
-            </div>
+      </div>
 
             {/* Bouton nouveau plan */}
           </>
@@ -315,14 +315,14 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
         <div className="mt-10 p-5 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl border border-blue-100 shadow-sm">
           <h3 className="text-lg font-semibold text-blue-900 mb-3 flex items-center"><TrendingUp className="h-5 w-5 mr-2" />Conseils pour progresser</h3>
           <ul className="text-blue-800 text-sm space-y-2">
-            <li>• Commencez par les compétences haute priorité</li>
-            <li>• Consacrez du temps régulier à l'apprentissage</li>
-            <li>• Fixez-vous des objectifs réalisables</li>
-            <li>• Pratiquez régulièrement ce que vous apprenez</li>
+              <li>• Commencez par les compétences haute priorité</li>
+              <li>• Consacrez du temps régulier à l'apprentissage</li>
+              <li>• Fixez-vous des objectifs réalisables</li>
+              <li>• Pratiquez régulièrement ce que vous apprenez</li>
             <li>• Créez des projets personnels ou rejoignez des communautés</li>
             <li>• Mettez à jour votre CV au fur et à mesure de vos progrès</li>
-          </ul>
-        </div>
+            </ul>
+          </div>
       </div>
       {/* Modal lecteur YouTube */}
       {selectedVideo && (
