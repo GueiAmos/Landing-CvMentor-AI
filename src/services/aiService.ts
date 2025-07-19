@@ -359,6 +359,54 @@ ${style.closing}`;
       ]
     }));
   }
+
+  async generateInterviewIntro(jobOffer: JobOffer): Promise<string> {
+    if (this.useRealAPI) {
+      try {
+        return await geminiService.generateInterviewIntro(jobOffer);
+      } catch (error) {
+        console.warn('Fallback vers intro simulée:', error);
+      }
+    }
+
+    // Simulation locale en fallback
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return `Bonjour et bienvenue ! Je suis ${Math.random() > 0.5 ? 'Sarah' : 'David'}, DRH chez **${jobOffer.company}**. 
+
+Je suis ravi(e) de vous rencontrer aujourd'hui pour discuter du poste de **${jobOffer.title}**. 
+
+Cet entretien va nous permettre de mieux nous connaître mutuellement. Je vais vous poser quelques questions sur votre parcours, vos motivations et vos compétences, et vous pourrez également me poser toutes vos questions sur le poste et notre entreprise.
+
+Pour commencer, pourriez-vous vous présenter en quelques minutes et me parler de votre parcours professionnel ?`;
+  }
+
+  async interviewChatWithGemini(
+    chatHistory: Array<{ role: string; content: string }>, 
+    jobOffer?: JobOffer
+  ): Promise<string> {
+    if (this.useRealAPI) {
+      try {
+        return await geminiService.interviewChatWithGemini(chatHistory, jobOffer);
+      } catch (error) {
+        console.warn('Fallback vers réponse simulée:', error);
+      }
+    }
+
+    // Simulation locale en fallback
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const responses = [
+      "Très intéressant ! Pouvez-vous me donner un exemple concret d'un projet dont vous êtes particulièrement fier(ère) ?",
+      "C'est une expérience enrichissante. Comment gérez-vous le stress et la pression dans votre travail ?",
+      "Parfait ! Qu'est-ce qui vous motive le plus dans ce type de poste ?",
+      "Merci pour cette réponse. Pourquoi souhaitez-vous rejoindre notre entreprise spécifiquement ?",
+      "Excellent ! Avez-vous des questions sur le poste ou sur notre entreprise ?",
+      "C'est une bonne approche. Comment voyez-vous votre évolution professionnelle dans les 3 prochaines années ?"
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  }
 }
 
 export const aiService = new AIService();

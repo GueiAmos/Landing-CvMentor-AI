@@ -389,6 +389,75 @@ IMPORTANT :
       throw new Error('Erreur lors de la génération du plan de compétences');
     }
   }
+
+  async generateInterviewIntro(jobOffer: JobOffer): Promise<string> {
+    const prompt = `
+Tu es un DRH expérimenté de l'entreprise "${jobOffer.company}" qui va faire passer un entretien pour le poste de "${jobOffer.title}".
+
+Offre d'emploi :
+Titre : ${jobOffer.title}
+Entreprise : ${jobOffer.company}
+Description : ${jobOffer.description}
+
+Commence l'entretien par un message d'accueil chaleureux et professionnel. Présente-toi brièvement, explique le déroulement de l'entretien et pose la première question classique pour que le candidat se présente.
+
+Ton style doit être :
+- Professionnel mais bienveillant
+- Adapté au poste et à l'entreprise
+- Encourageant pour mettre le candidat à l'aise
+- Utilise un vocabulaire simple et accessible
+
+Réponds directement avec ton message d'introduction, sans commentaires additionnels.
+`;
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      return response.text().trim();
+    } catch (error) {
+      console.error('Erreur génération intro entretien Gemini:', error);
+      throw new Error('Erreur lors de la génération de l\'introduction');
+    }
+  }
+
+  async interviewChatWithGemini(
+    chatHistory: Array<{ role: string; content: string }>, 
+    jobOffer?: JobOffer
+  ): Promise<string> {
+    const contextPrompt = `
+Tu es un DRH expérimenté qui fait passer un entretien d'embauche pour le poste suivant :
+
+${jobOffer ? `
+Titre : ${jobOffer.title}
+Entreprise : ${jobOffer.company}
+Description : ${jobOffer.description}
+` : 'Poste générique'}
+
+INSTRUCTIONS IMPORTANTES :
+- Tu es en entretien avec un candidat, reste dans ce rôle
+- Pose des questions pertinentes liées au poste et à l'entreprise
+- Évalue les réponses du candidat de manière constructive
+- Adapte tes questions selon les réponses précédentes
+- Sois professionnel mais bienveillant
+- Utilise un vocabulaire simple et accessible
+- Pose une seule question à la fois
+- Varie les types de questions : expérience, motivation, situations, compétences techniques
+
+Historique de la conversation :
+${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
+
+Réponds en tant que DRH. Pose la question suivante ou donne un feedback constructif selon le contexte.
+`;
+
+    try {
+      const result = await this.model.generateContent(contextPrompt);
+      const response = await result.response;
+      return response.text().trim();
+    } catch (error) {
+      console.error('Erreur chat entretien Gemini:', error);
+      throw new Error('Erreur lors de la génération de la réponse');
+    }
+  }
 }
 
 export const geminiService = new GeminiService();
