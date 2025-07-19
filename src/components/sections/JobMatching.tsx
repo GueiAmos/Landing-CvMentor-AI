@@ -409,12 +409,12 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                 // Intersection réelle si possible
                 let aligned: string[] = [];
                 if (matchResult.cvSkills && matchResult.offerSkills) {
-                  const cvSkills = matchResult.cvSkills.map((s: string) => s.trim().toLowerCase());
-                  const offerSkills = matchResult.offerSkills.map((s: string) => s.trim().toLowerCase());
+                  const cvSkills = matchResult.cvSkills.map((s: string) => String(s || '').trim().toLowerCase());
+                  const offerSkills = matchResult.offerSkills.map((s: string) => String(s || '').trim().toLowerCase());
                   aligned = cvSkills.filter(skill => offerSkills.includes(skill));
                   // Optionnel : recouper avec alignedSkills du backend si dispo
                   if (matchResult.alignedSkills) {
-                    const backendAligned = matchResult.alignedSkills.map((s: string) => s.trim().toLowerCase());
+                    const backendAligned = matchResult.alignedSkills.map((s: string) => String(s || '').trim().toLowerCase());
                     aligned = aligned.filter(skill => backendAligned.includes(skill));
                   }
                 } else if (matchResult.alignedSkills) {
