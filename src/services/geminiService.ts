@@ -128,7 +128,8 @@ IMPORTANT :
 
   async matchCVWithJob(cvText: string, jobOffer: JobOffer): Promise<CVJobMatch> {
     const prompt = `
-Comparez ce CV avec cette offre d'emploi et évaluez la compatibilité.
+Tu es un DRH expérimenté dans le secteur concerné par l’offre d’emploi ci-dessous.
+Analyse le CV et l’offre d’emploi suivants :
 
 CV du candidat :
 ${cvText}
@@ -139,38 +140,45 @@ Entreprise : ${jobOffer.company}
 Description : ${jobOffer.description}
 Compétences requises : ${jobOffer.skills.join(', ')}
 
-Fournissez une analyse au format JSON avec cette structure exacte :
+1. Extraction structurée de l'offre :
+- Intitulé du poste
+- Exigences (expérience, niveau d’étude, certifications, etc.)
+- Compétences attendues
+- Missions principales
+
+2. Matching raisonné façon DRH :
+- Liste des compétences du CV qui correspondent à l’offre (points forts, expliquer pourquoi)
+- Liste des compétences manquantes ou à renforcer (expliquer leur importance pour le poste)
+- Score global de compatibilité RH (sur 100)
+
+3. Conseils personnalisés :
+- Conseils pour adapter ou enrichir le CV pour ce poste
+- Suggestions de formations/certifications reconnues pour combler les écarts
+- Conseils d’adaptation (mots-clés à ajouter, expériences à valoriser, etc.)
+
+Réponds uniquement avec un JSON structuré de la forme :
 {
   "compatibilityRate": number (pourcentage entre 0 et 100),
   "alignedSkills": [array des compétences du candidat qui correspondent],
   "gaps": [array des compétences manquantes spécifiquement pour ce poste],
-  "adaptationTips": [array de 4-5 conseils pour améliorer la candidature]
+  "adaptationTips": [array de conseils pour améliorer la candidature],
+  "cvSkills": [array des compétences extraites du CV],
+  "offerSkills": [array des compétences extraites de l'offre],
+  "rhAdvice": "conseils RH personnalisés pour adapter le CV à l'offre (texte)",
+  "trainingSuggestions": [array ou texte de suggestions de formations/certifications],
+  "cvTips": "conseils pour enrichir ou reformuler le CV (texte)"
 }
 
-Analysez :
-1. La correspondance entre les compétences du CV et celles requises
-2. L'adéquation de l'expérience avec le poste
-3. Les compétences manquantes spécifiquement demandées par l'employeur
-4. Les points forts à mettre en avant
-
-IMPORTANT :
-- Utilisez un vocabulaire simple et accessible
-- Mettez les éléments importants entre **double astérisques** pour les mettre en gras
-- Donnez des conseils pratiques et facilement applicables
-- Adaptez au marché de l'emploi africain
-- Pour les gaps, listez uniquement les compétences que l'employeur recherche mais qui manquent au candidat
-`;
+Sois critique, constructif, et adopte le point de vue d’un recruteur métier. Utilise un langage simple et accessible.`;
 
     try {
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
-      
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-      
       throw new Error('Format de réponse invalide');
     } catch (error) {
       console.error('Erreur matching Gemini:', error);

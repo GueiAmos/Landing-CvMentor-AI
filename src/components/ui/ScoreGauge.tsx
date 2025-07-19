@@ -18,8 +18,8 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   
   const sizeClasses = {
     sm: { width: 80, height: 80, strokeWidth: 6, fontSize: 'text-lg' },
-    md: { width: 120, height: 120, strokeWidth: 8, fontSize: 'text-2xl' },
-    lg: { width: 160, height: 160, strokeWidth: 10, fontSize: 'text-3xl' }
+    md: { width: 100, height: 100, strokeWidth: 8, fontSize: 'text-xl sm:text-2xl' },
+    lg: { width: 140, height: 140, strokeWidth: 10, fontSize: 'text-2xl sm:text-3xl' }
   };
   
   const { width, height, strokeWidth, fontSize } = sizeClasses[size];
@@ -57,10 +57,10 @@ const ScoreGauge: React.FC<ScoreGaugeProps> = ({
         </svg>
         <div className={`absolute inset-0 flex flex-col items-center justify-center ${fontSize} font-bold text-gray-800`}>
           <span>{score.toFixed(1)}</span>
-          <span className="text-xs text-gray-500">/{maxScore}</span>
+          <span className="text-xs sm:text-sm text-gray-500">/{maxScore}</span>
         </div>
       </div>
-      {label && <p className="mt-2 text-sm text-gray-600 text-center">{label}</p>}
+      {label && <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600 text-center font-medium">{label}</p>}
     </div>
   );
 };

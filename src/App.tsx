@@ -13,6 +13,7 @@ function App() {
 
   const handleNavigate = (section: string) => {
     setCurrentSection(section);
+    window.scrollTo(0, 0);
   };
 
   const renderCurrentSection = () => {
@@ -22,13 +23,13 @@ function App() {
       case 'cv-analysis':
         return <CVAnalysis />;
       case 'job-matching':
-        return <JobMatching />;
+        return <JobMatching onNavigate={handleNavigate} />;
       case 'cover-letter':
         return <CoverLetter />;
       case 'interview':
         return <InterviewSimulation />;
       case 'skills':
-        return <SkillsDevelopment />;
+        return <SkillsDevelopment onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }

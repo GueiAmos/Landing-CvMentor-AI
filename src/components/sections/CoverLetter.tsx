@@ -19,6 +19,11 @@ const CoverLetter: React.FC = () => {
       setCoverLetter(session.coverLetter);
       setTone(session.coverLetter.tone);
     }
+    // Annuler tout état "en cours" si on revient sur la page
+    setIsGenerating(false);
+    setError('');
+    // Optionnel : effacer les résultats partiels si on veut forcer une nouvelle génération
+    // setCoverLetter(null);
   }, []);
 
   const generateCoverLetter = async () => {

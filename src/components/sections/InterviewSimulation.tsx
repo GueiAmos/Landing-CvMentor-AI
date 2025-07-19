@@ -29,6 +29,11 @@ const InterviewSimulation: React.FC = () => {
       setFeedback(session.interviewResults.feedback);
       setIsComplete(true);
     }
+    // Annuler tout état "en cours" si on revient sur la page
+    setIsLoading(false);
+    setError('');
+    // Optionnel : effacer les résultats partiels si on veut forcer une nouvelle génération
+    // setQuestions([]); setAnswers([]); setFeedback([]); setIsComplete(false);
   }, []);
 
   useEffect(() => {

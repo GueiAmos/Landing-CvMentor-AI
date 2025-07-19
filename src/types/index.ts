@@ -24,6 +24,8 @@ export interface CVJobMatch {
   alignedSkills: string[];
   gaps: string[];
   adaptationTips: string[];
+  cvSkills?: string[];
+  offerSkills?: string[];
 }
 
 export interface CoverLetter {
@@ -61,8 +63,16 @@ export interface Resource {
   description: string;
 }
 
+export interface UploadedFile {
+  name: string;
+  type: string;
+  size: number;
+  data: string; // base64 data
+}
+
 export interface UserSession {
   cvText?: string;
+  uploadedFile?: UploadedFile; // Fichier PDF sauvegardé
   cvAnalysis?: CVAnalysis;
   jobOffer?: JobOffer;
   cvJobMatch?: CVJobMatch;
@@ -74,4 +84,6 @@ export interface UserSession {
     globalScore: number;
   };
   skillGaps?: SkillGap[];
+  lastSkillPlanCVId?: string;
+  forceSkillPlanRegeneration?: boolean;
 }
