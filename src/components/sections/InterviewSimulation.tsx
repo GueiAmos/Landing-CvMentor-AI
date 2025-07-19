@@ -306,13 +306,18 @@ const InterviewSimulation: React.FC = () => {
         <div ref={chatBottomRef} />
       </div>
       <div className="flex items-center gap-2 mt-auto">
-        <button
-          onClick={handleMic}
-          className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full text-blue-600"
-          aria-label="Répondre par la voix"
-        >
-          <Mic className="h-5 w-5" />
-        </button>
+        <VoiceRecorder
+          onRecordingComplete={handleRecordingComplete}
+          isRecording={isRecording}
+          onStartRecording={handleStartRecording}
+          onStopRecording={handleStopRecording}
+        />
+        {isTranscribing && (
+          <div className="flex items-center text-blue-600 text-sm">
+            <Loader2 className="animate-spin h-4 w-4 mr-1" />
+            Transcription...
+          </div>
+        )}
         <input
           ref={inputRef}
           type="text"
