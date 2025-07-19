@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Mic, Send, Loader2, ArrowLeft, MicOff, Volume2, Brain } from 'lucide-react';
+import { MessageCircle, Mic, Send, Loader2, ArrowLeft, MicOff, Volume2, Brain, Play, Pause } from 'lucide-react';
 import { aiService } from '../../services/aiService';
 import { getSession } from '../../utils/storage';
 import LoadingSpinner from '../ui/LoadingSpinner';
@@ -8,6 +8,8 @@ import MarkdownRenderer from '../ui/MarkdownRenderer';
 interface ChatMessage {
   role: 'user' | 'ia';
   content: string;
+  audioBlob?: Blob;
+  audioUrl?: string;
 }
 
 interface VoiceRecorderProps {
@@ -108,8 +110,10 @@ const InterviewSimulation: React.FC = () => {
   const [questionCount, setQuestionCount] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
+  const [playingAudio, setPlayingAudio] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const audioRefs = useRef<{ [key: string]: HTMLAudioElement }>({});
 
   // Scroll to bottom on new message
   useEffect(() => {
@@ -143,9 +147,21 @@ const InterviewSimulation: React.FC = () => {
   const sendMessage = async (message: string, audioBlob?: Blob) => {
     if (!message.trim() && !audioBlob) return;
     
+    // Créer une URL pour l'audio si présent
+    let audioUrl: string | undefined;
+    if (audioBlob) {
+      audioUrl = URL.createObjectURL(audioBlob);
+    }
+    
     // Ajouter le message à l'historique (texte ou indication audio)
     const displayMessage = audioBlob ? "🎤 Message vocal envoyé" : message;
-    setChat((prev) => [...prev, { role: 'user', content: displayMessage }]);
+    const messageId = `user_${Date.now()}`;
+    setChat((prev) => [...prev, { 
+      role: 'user', 
+      content: displayMessage,
+      audioBlob,
+      audioUrl
+    }]);
     setInput('');
     setIsLoading(true);
     setError('');
@@ -208,6 +224,49 @@ const InterviewSimulation: React.FC = () => {
   const handleStopRecording = () => {
     setIsRecording(false);
   };
+
+  // Gestion de la lecture audio
+  const toggleAudioPlayback = (messageIndex: number, audioUrl: string) => {
+    const audioKey = `audio_${messageIndex}`;
+    
+    if (playingAudio === audioKey) {
+      // Arrêter la lecture
+      if (audioRefs.current[audioKey]) {
+        audioRefs.current[audioKey].pause();
+        audioRefs.current[audioKey].currentTime = 0;
+      }
+      setPlayingAudio(null);
+    } else {
+      // Arrêter toute autre lecture en cours
+      if (playingAudio && audioRefs.current[playingAudio]) {
+        audioRefs.current[playingAudio].pause();
+        audioRefs.current[playingAudio].currentTime = 0;
+      }
+      
+      // Démarrer la nouvelle lecture
+      if (!audioRefs.current[audioKey]) {
+        audioRefs.current[audioKey] = new Audio(audioUrl);
+        audioRefs.current[audioKey].onended = () => setPlayingAudio(null);
+      }
+      
+      audioRefs.current[audioKey].play();
+      setPlayingAudio(audioKey);
+    }
+  };
+
+  // Nettoyage des URLs d'objets lors du démontage
+  useEffect(() => {
+    return () => {
+      chat.forEach((msg) => {
+        if (msg.audioUrl) {
+          URL.revokeObjectURL(msg.audioUrl);
+        }
+      });
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+      });
+    };
+  }, []);
 
   // Annulation/reinitialisation
   const resetSession = () => {
@@ -282,6 +341,25 @@ const InterviewSimulation: React.FC = () => {
           <div key={idx} className={`mb-4 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}> 
             <div className={`max-w-[80%] px-4 py-3 rounded-2xl shadow ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-md' : 'bg-gray-100 text-gray-900 rounded-bl-md'}`}>
               <MarkdownRenderer content={msg.content} />
+              {msg.audioUrl && (
+                <div className="mt-2 flex items-center">
+                  <button
+                    onClick={() => toggleAudioPlayback(idx, msg.audioUrl!)}
+                    className={`flex items-center px-2 py-1 rounded text-xs ${
+                      msg.role === 'user' 
+                        ? 'bg-blue-500 hover:bg-blue-400 text-white' 
+                        : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                    }`}
+                  >
+                    {playingAudio === `audio_${idx}` ? (
+                      <Pause className="h-3 w-3 mr-1" />
+                    ) : (
+                      <Play className="h-3 w-3 mr-1" />
+                    )}
+                    {playingAudio === `audio_${idx}` ? 'Pause' : 'Écouter'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
