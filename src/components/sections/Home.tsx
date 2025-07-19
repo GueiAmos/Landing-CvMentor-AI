@@ -21,8 +21,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
     },
     {
       icon: <Users className="h-8 w-8 text-blue-600" />,
-      title: 'Simulation d\'Entretien',
-      description: 'Préparez-vous avec des entretiens simulés et recevez des conseils personnalisés.',
+      title: 'DRH IA - Entretien Live',
+      description: 'Échangez avec notre DRH IA par écrit ou par vocal pour un entretien réaliste.',
       action: () => onNavigate('interview')
     },
     {
@@ -78,7 +78,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             >
               <span className="flex items-center justify-center">
                 <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3 group-hover:rotate-12 transition-transform" />
-                Simuler un entretien
+                Parler au DRH IA
               </span>
             </button>
           </div>

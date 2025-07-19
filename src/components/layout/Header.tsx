@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
     { id: 'cv-analysis', label: 'Analyser CV' },
     { id: 'job-matching', label: 'Comparaison' },
     { id: 'cover-letter', label: 'Lettre' },
-    { id: 'interview', label: 'Entretien' },
+    { id: 'interview', label: 'DRH IA' },
     // { id: 'skills', label: 'Compétences' }
   ];
 
