@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Brain } from 'lucide-react';
 
 interface HeaderProps {
   currentSection: string;
