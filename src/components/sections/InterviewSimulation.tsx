@@ -6,6 +6,7 @@ import { InterviewQuestion, InterviewFeedback } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ProgressBar from '../ui/ProgressBar';
 import ScoreGauge from '../ui/ScoreGauge';
+import MarkdownRenderer from '../ui/MarkdownRenderer';
 
 const InterviewSimulation: React.FC = () => {
   const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
@@ -210,7 +211,7 @@ const InterviewSimulation: React.FC = () => {
                     <MessageCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
                     <div>
                       <h4 className="font-medium text-gray-900">Feedback :</h4>
-                      <p className="text-gray-700">{feedback[index].feedback}</p>
+                      <MarkdownRenderer content={feedback[index].feedback} className="text-gray-700" />
                     </div>
                   </div>
 
@@ -221,7 +222,9 @@ const InterviewSimulation: React.FC = () => {
                         <h4 className="font-medium text-gray-900">Suggestions d'amélioration :</h4>
                         <ul className="text-gray-700 list-disc list-inside">
                           {feedback[index].improvements.map((improvement, i) => (
-                            <li key={i}>{improvement}</li>
+                            <li key={i}>
+                              <MarkdownRenderer content={improvement} />
+                            </li>
                           ))}
                         </ul>
                       </div>

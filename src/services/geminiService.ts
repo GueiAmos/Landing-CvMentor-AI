@@ -41,8 +41,12 @@ Critères d'évaluation :
 - Impact : Pertinence des expériences, quantification des résultats, valeur ajoutée
 - Structure : Hiérarchie visuelle, sections logiques, progression chronologique
 
-Adaptez vos conseils au contexte professionnel africain et aux standards internationaux.
-Soyez constructif et spécifique dans vos recommandations.
+IMPORTANT : 
+- Utilisez un vocabulaire simple et accessible, évitez les termes techniques complexes
+- Rédigez dans un langage facilement compréhensible dès la première lecture
+- Mettez les mots importants entre **double astérisques** pour les mettre en gras
+- Soyez constructif et donnez des conseils pratiques et concrets
+- Adaptez vos conseils au contexte professionnel africain
 `;
 
     try {
@@ -88,8 +92,12 @@ Critères d'évaluation :
 - Impact : Pertinence des expériences, quantification des résultats, valeur ajoutée
 - Structure : Hiérarchie visuelle, sections logiques, progression chronologique
 
-Adaptez vos conseils au contexte professionnel africain et aux standards internationaux.
-Soyez constructif et spécifique dans vos recommandations.
+IMPORTANT : 
+- Utilisez un vocabulaire simple et accessible, évitez les termes techniques complexes
+- Rédigez dans un langage facilement compréhensible dès la première lecture
+- Mettez les mots importants entre **double astérisques** pour les mettre en gras
+- Soyez constructif et donnez des conseils pratiques et concrets
+- Adaptez vos conseils au contexte professionnel africain
 `;
 
     try {
@@ -145,7 +153,11 @@ Analysez :
 3. Les lacunes critiques à combler
 4. Les points forts à mettre en avant
 
-Adaptez votre analyse au marché de l'emploi africain et donnez des conseils pratiques.
+IMPORTANT :
+- Utilisez un vocabulaire simple et accessible
+- Mettez les éléments importants entre **double astérisques** pour les mettre en gras
+- Donnez des conseils pratiques et facilement applicables
+- Adaptez au marché de l'emploi africain
 `;
 
     try {
@@ -193,9 +205,10 @@ Exigences :
 - Lettre complète de 250-350 mots
 - Structure : en-tête, introduction, développement (2 paragraphes), conclusion
 - Personnalisée selon le profil et l'offre
-- Adaptée au contexte professionnel africain
+- Vocabulaire simple et accessible
 - Mettez en valeur les compétences alignées avec le poste
 - Montrez la motivation et la valeur ajoutée du candidat
+- Utilisez **double astérisques** pour mettre en gras les éléments importants
 
 Répondez uniquement avec le contenu de la lettre, sans commentaires additionnels.
 `;
@@ -241,7 +254,10 @@ Répartition souhaitée :
 - 3 questions comportementales (situations, défis, travail en équipe)
 - 2 questions techniques (compétences, méthodes de travail)
 
-Adaptez les questions au contexte africain et au secteur d'activité.
+IMPORTANT :
+- Utilisez un vocabulaire simple et accessible
+- Formulez des questions claires et faciles à comprendre
+- Adaptez au contexte africain et au secteur d'activité
 `;
 
     try {
@@ -287,7 +303,11 @@ Critères d'évaluation :
 - Exemples concrets et quantifiés
 - Adéquation avec le poste visé
 
-Soyez constructif et encourageant dans vos commentaires.
+IMPORTANT :
+- Utilisez un vocabulaire simple et accessible
+- Mettez les points importants entre **double astérisques**
+- Soyez constructif et encourageant
+- Donnez des conseils pratiques et facilement applicables
 `;
 
     try {
@@ -329,7 +349,14 @@ Fournissez un plan au format JSON :
         }
       ]
     }
-- Proposez 2-3 ressources gratuites ou accessibles
+  ]
+}
+
+IMPORTANT :
+- Utilisez un vocabulaire simple et accessible
+- Mettez les éléments importants entre **double astérisques**
+- Proposez des ressources gratuites ou peu coûteuses
+- Donnez des conseils pratiques et réalisables
 `;
 
     try {

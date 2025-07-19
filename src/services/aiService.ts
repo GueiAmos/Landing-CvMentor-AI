@@ -46,27 +46,27 @@ class AIService {
         structure: Math.round((globalScore * 1.1 - Math.random() * 0.5) * 10) / 10,
       },
       strengths: [
-        'Expérience professionnelle bien documentée',
-        'Compétences techniques clairement identifiées',
-        'Formation en adéquation avec le secteur visé',
-        'Présentation structurée et professionnelle'
+        '**Expérience professionnelle** bien expliquée et détaillée',
+        '**Compétences techniques** clairement présentées',
+        '**Formation** qui correspond bien au secteur visé',
+        '**Présentation** bien organisée et professionnelle'
       ].slice(0, Math.floor(Math.random() * 2) + 2),
       improvements: [
-        'Ajouter des métriques quantifiées sur vos réalisations',
-        'Développer la section des projets personnels',
-        'Inclure plus de mots-clés sectoriels',
-        'Améliorer la description des responsabilités',
-        'Ajouter des certifications professionnelles'
+        'Ajouter des **chiffres concrets** sur vos réussites (ex: "j\'ai augmenté les ventes de 20%")',
+        'Développer la section **projets personnels** pour montrer votre motivation',
+        'Inclure plus de **mots-clés** du secteur pour être mieux repéré',
+        'Mieux expliquer vos **responsabilités** avec des exemples précis',
+        'Ajouter des **formations** ou certifications récentes'
       ].slice(0, Math.floor(Math.random() * 2) + 3),
       missingKeywords: [
-        'leadership', 'gestion de projet', 'innovation', 'collaboration',
-        'résolution de problèmes', 'adaptabilité', 'autonomie'
+        '**leadership**', '**gestion de projet**', '**innovation**', '**travail en équipe**',
+        '**résolution de problèmes**', '**adaptabilité**', '**autonomie**'
       ].slice(0, Math.floor(Math.random() * 3) + 2),
       formatRecommendations: [
-        'Utiliser des puces pour améliorer la lisibilité',
-        'Limiter le CV à 2 pages maximum',
-        'Adopter une police professionnelle (Arial, Calibri)',
-        'Ajouter des espaces blancs pour aérer le contenu'
+        'Utiliser des **puces** pour rendre la lecture plus facile',
+        'Garder votre CV sur **2 pages maximum**',
+        'Choisir une **police simple** comme Arial ou Calibri',
+        'Laisser des **espaces** entre les sections pour aérer'
       ].slice(0, Math.floor(Math.random() * 2) + 2)
     };
   }
@@ -96,27 +96,27 @@ class AIService {
         structure: Math.round((globalScore * 1.1 - Math.random() * 0.5) * 10) / 10,
       },
       strengths: [
-        'Document PDF professionnel et bien formaté',
-        'Structure claire et lisible',
-        'Présentation soignée',
-        'Format adapté aux standards professionnels'
+        '**Document PDF** professionnel et bien présenté',
+        '**Structure claire** et facile à lire',
+        '**Présentation soignée** qui fait bonne impression',
+        '**Format adapté** aux standards professionnels'
       ].slice(0, Math.floor(Math.random() * 2) + 3),
       improvements: [
-        'Ajouter des métriques quantifiées sur vos réalisations',
-        'Développer la section des projets personnels',
-        'Inclure plus de mots-clés sectoriels',
-        'Améliorer la description des responsabilités',
-        'Ajouter des certifications professionnelles'
+        'Ajouter des **chiffres concrets** sur vos réussites',
+        'Développer la section **projets personnels**',
+        'Inclure plus de **mots-clés** du secteur',
+        'Mieux expliquer vos **responsabilités**',
+        'Ajouter des **formations** récentes'
       ].slice(0, Math.floor(Math.random() * 2) + 3),
       missingKeywords: [
-        'leadership', 'gestion de projet', 'innovation', 'collaboration',
-        'résolution de problèmes', 'adaptabilité', 'autonomie'
+        '**leadership**', '**gestion de projet**', '**innovation**', '**collaboration**',
+        '**résolution de problèmes**', '**adaptabilité**', '**autonomie**'
       ].slice(0, Math.floor(Math.random() * 3) + 2),
       formatRecommendations: [
-        'Maintenir la qualité du format PDF',
-        'Optimiser pour les systèmes de lecture automatique (ATS)',
-        'Assurer la compatibilité sur tous les appareils',
-        'Garder une taille de fichier raisonnable'
+        'Garder la **qualité du format PDF**',
+        'S\'assurer que les **robots de recrutement** peuvent le lire',
+        'Vérifier que ça s\'ouvre bien sur **tous les appareils**',
+        'Garder un **fichier pas trop lourd**'
       ].slice(0, Math.floor(Math.random() * 2) + 2)
     };
   }
@@ -160,11 +160,11 @@ class AIService {
         'Compétences en analyse de données'
       ].slice(0, Math.max(1, 5 - matchedSkills)),
       adaptationTips: [
-        'Mettre en avant vos projets similaires au poste',
-        'Personnaliser votre CV avec les mots-clés de l\'offre',
-        'Développer la section sur vos réalisations quantifiées',
-        'Ajouter une section "Projets pertinents"',
-        'Mentionner votre motivation pour ce secteur d\'activité'
+        'Mettre en avant vos **projets similaires** au poste demandé',
+        'Utiliser les **mots-clés** de l\'offre dans votre CV',
+        'Ajouter des **chiffres** sur vos réussites passées',
+        'Créer une section **"Projets importants"**',
+        'Expliquer pourquoi ce **secteur vous passionne**'
       ].slice(0, 4)
     };
   }
@@ -201,11 +201,11 @@ class AIService {
     
     const style = toneStyles[tone];
     
-    const content = `${style.opening} pour le poste de ${jobOffer.title} au sein de ${jobOffer.company}.
+    const content = `${style.opening} pour le poste de **${jobOffer.title}** au sein de **${jobOffer.company}**.
 
-Fort(e) de mon expérience et de mes compétences en adéquation avec vos attentes, je suis convaincu(e) de pouvoir apporter une réelle valeur ajoutée à votre équipe. Mes réalisations précédentes et ma passion pour ce domaine me permettront de répondre efficacement aux défis de ce poste.
+Grâce à mon **expérience** et mes **compétences** qui correspondent à vos besoins, je peux apporter une vraie **valeur ajoutée** à votre équipe. Mes **réussites passées** et ma **passion** pour ce domaine me permettront de relever avec succès les défis de ce poste.
 
-Votre entreprise et ses valeurs résonnent parfaitement avec mes aspirations professionnelles. Je suis particulièrement motivé(e) par l'opportunité de contribuer à vos projets innovants et de développer mes compétences au sein de votre équipe dynamique.
+Votre entreprise et ses **valeurs** correspondent parfaitement à mes **objectifs professionnels**. Je suis particulièrement motivé(e) par l'opportunité de contribuer à vos **projets innovants** et de développer mes compétences au sein de votre équipe dynamique.
 
 ${style.closing}`;
 
@@ -303,11 +303,11 @@ ${style.closing}`;
     score = Math.max(1, Math.min(5, score));
     
     const feedbackMessages = {
-      1: 'Réponse trop courte, développez davantage vos idées',
-      2: 'Réponse insuffisante, ajoutez des exemples concrets',
-      3: 'Réponse correcte mais peut être améliorée',
-      4: 'Bonne réponse avec des éléments pertinents',
-      5: 'Excellente réponse, complète et bien structurée'
+      1: 'Réponse **trop courte**, il faut développer davantage vos idées',
+      2: 'Réponse **insuffisante**, ajoutez des **exemples concrets**',
+      3: 'Réponse **correcte** mais peut être améliorée',
+      4: '**Bonne réponse** avec des éléments pertinents',
+      5: '**Excellente réponse**, complète et bien organisée'
     };
     
     return {
@@ -315,10 +315,10 @@ ${style.closing}`;
       score: Math.round(score * 10) / 10,
       feedback: feedbackMessages[Math.round(score) as keyof typeof feedbackMessages],
       improvements: [
-        'Structurez votre réponse avec introduction, développement et conclusion',
-        'Ajoutez des exemples concrets de votre expérience',
-        'Quantifiez vos réalisations avec des chiffres',
-        'Montrez votre passion et votre motivation'
+        '**Organisez** votre réponse : introduction, développement, conclusion',
+        'Donnez des **exemples concrets** de votre expérience',
+        'Ajoutez des **chiffres** sur vos réussites',
+        'Montrez votre **passion** et votre **motivation**'
       ].slice(0, Math.round(Math.random() * 2) + 2)
     };
   }
@@ -354,8 +354,8 @@ ${style.closing}`;
       importance: index < 2 ? 'high' : index < 4 ? 'medium' : 'low',
       estimatedTime: '',
       resources: resourcesDatabase[gap] || [
-        { title: `Formation ${gap}`, type: 'course', url: '#', difficulty: 'intermediate', duration: '4 semaines', description: `Formation complète sur ${gap}` },
-        { title: `Guide pratique ${gap}`, type: 'article', url: '#', difficulty: 'beginner', duration: '1 heure', description: `Guide d'introduction à ${gap}` }
+        { title: `**Formation** ${gap}`, type: 'course', url: '#', difficulty: 'intermediate', duration: '4 semaines', description: `Formation complète sur **${gap}**` },
+        { title: `**Guide pratique** ${gap}`, type: 'article', url: '#', difficulty: 'beginner', duration: '1 heure', description: `Guide d'introduction à **${gap}**` }
       ]
     }));
   }
