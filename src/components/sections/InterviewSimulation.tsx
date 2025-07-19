@@ -176,17 +176,22 @@ const InterviewSimulation: React.FC = () => {
           onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
           className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           placeholder="Votre réponse…"
-          disabled={isLoading}
+          disabled={isLoading || interviewEnded}
         />
         <button
           onClick={handleSend}
           className="p-3 bg-orange-500 hover:bg-orange-600 text-white rounded-full ml-1"
-          disabled={isLoading || !input.trim()}
+          disabled={isLoading || !input.trim() || interviewEnded}
           aria-label="Envoyer"
         >
           <Send className="h-5 w-5" />
         </button>
       </div>
+      {interviewEnded && (
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
+          <p className="text-blue-800 font-medium">L'entretien est terminé. Génération du rapport en cours...</p>
+        </div>
+      )}
       {error && <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800">{error}</div>}
     </div>
   );
