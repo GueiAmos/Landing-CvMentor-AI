@@ -5,6 +5,7 @@ import { saveSession, getSession } from '../../utils/storage';
 import { JobOffer, CVJobMatch } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ProgressBar from '../ui/ProgressBar';
+import MarkdownRenderer from '../ui/MarkdownRenderer';
 
 const JobMatching: React.FC = () => {
   const [jobOffer, setJobOffer] = useState<Partial<JobOffer>>({
@@ -154,7 +155,7 @@ const JobMatching: React.FC = () => {
               {matchResult.alignedSkills.map((skill, index) => (
                 <div key={index} className="flex items-center bg-green-100 rounded-lg p-3">
                   <Target className="h-4 w-4 text-green-600 mr-2" />
-                  <span className="text-green-800 font-medium">{skill}</span>
+                  <MarkdownRenderer content={skill} className="text-green-800 font-medium" />
                 </div>
               ))}
             </div>
@@ -169,7 +170,7 @@ const JobMatching: React.FC = () => {
               {matchResult.gaps.map((gap, index) => (
                 <div key={index} className="flex items-center bg-red-100 rounded-lg p-3">
                   <TrendingUp className="h-4 w-4 text-red-600 mr-2" />
-                  <span className="text-red-800 font-medium">{gap}</span>
+                  <MarkdownRenderer content={gap} className="text-red-800 font-medium" />
                 </div>
               ))}
             </div>
@@ -183,7 +184,7 @@ const JobMatching: React.FC = () => {
             {matchResult.adaptationTips.map((tip, index) => (
               <div key={index} className="flex items-start bg-blue-50 rounded-lg p-4">
                 <Briefcase className="h-5 w-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
-                <span className="text-blue-800">{tip}</span>
+                <MarkdownRenderer content={tip} className="text-blue-800" />
               </div>
             ))}
           </div>

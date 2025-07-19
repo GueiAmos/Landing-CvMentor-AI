@@ -4,6 +4,7 @@ import { aiService } from '../../services/aiService';
 import { saveSession, getSession } from '../../utils/storage';
 import { CoverLetter as CoverLetterType } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
+import MarkdownRenderer from '../ui/MarkdownRenderer';
 
 const CoverLetter: React.FC = () => {
   const [tone, setTone] = useState<'formal' | 'dynamic' | 'creative'>('formal');
@@ -219,9 +220,9 @@ const CoverLetter: React.FC = () => {
           ) : coverLetter ? (
             <div className="prose max-w-none">
               <div className="bg-gray-50 p-6 rounded-lg border-l-4 border-blue-500">
-                <pre className="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">
-                  {coverLetter.content}
-                </pre>
+                <div className="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">
+                  <MarkdownRenderer content={coverLetter.content} />
+                </div>
               </div>
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">

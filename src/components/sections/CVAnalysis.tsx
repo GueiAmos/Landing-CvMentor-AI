@@ -5,6 +5,8 @@ import { saveSession, getSession } from '../../utils/storage';
 import { convertPDFToBase64, validatePDFFile } from '../../utils/pdfReader';
 import { CVAnalysis } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
+import MarkdownRenderer from '../ui/MarkdownRenderer';
+import CVPreview from '../ui/CVPreview';
 import ScoreGauge from '../ui/ScoreGauge';
 import ProgressBar from '../ui/ProgressBar';
 
@@ -15,6 +17,7 @@ const CVAnalysisComponent: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isConvertingPDF, setIsConvertingPDF] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   React.useEffect(() => {
     const session = getSession();
@@ -163,12 +166,23 @@ const CVAnalysisComponent: React.FC = () => {
             <div className="flex items-center mb-4">
               <CheckCircle className="h-6 w-6 text-green-600 mr-2" />
               <h3 className="text-xl font-semibold text-green-900">Points Forts</h3>
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="ml-auto text-blue-600 hover:text-blue-700 text-sm"
+              >
+                {showPreview ? 'Masquer' : 'Voir'} le CV
+              </button>
             </div>
+            {showPreview && (
+              <div className="mb-4">
+                <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
+              </div>
+            )}
             <ul className="space-y-3">
               {analysis.strengths.map((strength, index) => (
                 <li key={index} className="flex items-start">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-green-800">{strength}</span>
+                  <MarkdownRenderer content={strength} className="text-green-800" />
                 </li>
               ))}
             </ul>
@@ -183,7 +197,7 @@ const CVAnalysisComponent: React.FC = () => {
               {analysis.improvements.map((improvement, index) => (
                 <li key={index} className="flex items-start">
                   <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span className="text-orange-800">{improvement}</span>
+                  <MarkdownRenderer content={improvement} className="text-orange-800" />
                 </li>
               ))}
             </ul>
@@ -215,7 +229,7 @@ const CVAnalysisComponent: React.FC = () => {
             {analysis.formatRecommendations.map((recommendation, index) => (
               <div key={index} className="flex items-start bg-gray-50 rounded-lg p-4">
                 <FileText className="h-5 w-5 text-gray-600 mr-3 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700">{recommendation}</span>
+                <MarkdownRenderer content={recommendation} className="text-gray-700" />
               </div>
             ))}
           </div>
@@ -303,16 +317,28 @@ const CVAnalysisComponent: React.FC = () => {
           {/* Text Preview */}
           {cvText && !cvText.startsWith('[PDF analysé:') && (
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Aperçu du contenu extrait</h3>
-              <div className="bg-gray-50 rounded-lg p-4 max-h-40 overflow-y-auto">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {cvText.substring(0, 500)}
-                  {cvText.length > 500 && '...'}
-                </p>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Aperçu du contenu extrait</h3>
+                <button
+                  onClick={() => setShowPreview(!showPreview)}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  {showPreview ? 'Masquer' : 'Voir'} le CV complet
+                </button>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
-                {cvText.length} caractères extraits
-              </p>
+              {showPreview ? (
+                <CVPreview cvText={cvText} uploadedFile={uploadedFile} />
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                    {cvText.substring(0, 300)}
+                    {cvText.length > 300 && '...'}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {cvText.length} caractères extraits
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
