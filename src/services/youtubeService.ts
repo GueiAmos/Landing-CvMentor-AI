@@ -1,14 +1,4 @@
-interface YouTubeVideo {
-  id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  channelTitle: string;
-  duration: string;
-  viewCount: string;
-  publishedAt: string;
-  url: string;
-}
+import { YouTubeVideo, YouTubeSearchResult } from '../types';
 
 interface YouTubeSearchResponse {
   items: Array<{
@@ -71,10 +61,13 @@ class YouTubeService {
     return `${count} vues`;
   }
 
-  async searchVideos(skill: string, maxResults: number = 6): Promise<YouTubeVideo[]> {
+  async searchVideos(skill: string, maxResults: number = 6): Promise<YouTubeSearchResult> {
     if (!this.apiKey) {
       console.warn('YouTube API key not configured');
-      return this.getMockVideos(skill);
+      return {
+        videos: this.getMockVideos(skill),
+        language: 'mock'
+      };
     }
 
     try {
@@ -86,7 +79,10 @@ class YouTubeService {
       const searchData: YouTubeSearchResponse = await searchResponse.json();
 
       if (!searchData.items || searchData.items.length === 0) {
-        return this.getMockVideos(skill);
+        return {
+          videos: this.getMockVideos(skill),
+          language: 'mock'
+        };
       }
 
       // Récupérer les détails des vidéos (durée, vues)
@@ -97,7 +93,7 @@ class YouTubeService {
       const detailsData: YouTubeVideoDetailsResponse = await detailsResponse.json();
 
       // Combiner les données
-      return searchData.items.map((item, index) => {
+      const videos = searchData.items.map((item, index) => {
         const details = detailsData.items[index];
         return {
           id: item.id.videoId,
@@ -112,9 +108,17 @@ class YouTubeService {
         };
       });
 
+      return {
+        videos,
+        language: 'fr'
+      };
+
     } catch (error) {
       console.error('YouTube API Error:', error);
-      return this.getMockVideos(skill);
+      return {
+        videos: this.getMockVideos(skill),
+        language: 'mock'
+      };
     }
   }
 

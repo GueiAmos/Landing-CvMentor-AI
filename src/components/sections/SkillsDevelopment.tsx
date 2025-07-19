@@ -3,7 +3,7 @@ import { TrendingUp, BookOpen, Clock, Star, ExternalLink, Target, Award, Play, R
 import { aiService } from '../../services/aiService';
 import { youtubeService } from '../../services/youtubeService';
 import { saveSession, getSession } from '../../utils/storage';
-import { SkillGap, Resource } from '../../types';
+import { SkillGap, Resource, YouTubeVideo } from '../../types';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import YouTubePlayer from '../ui/YouTubePlayer';
 
@@ -11,14 +11,12 @@ interface SkillsDevelopmentProps {
   onNavigate?: (section: string) => void;
 }
 
-const YOUTUBE_API_KEY = 'AIzaSyCyM7BmzAS9DuXH_Q2X_mkesoc1m-0WdDo';
-
 const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => {
   const [skillGaps, setSkillGaps] = useState<SkillGap[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [youtubeVideos, setYoutubeVideos] = useState<{ [skill: string]: any[] }>({});
+  const [youtubeVideos, setYoutubeVideos] = useState<{ [skill: string]: YouTubeVideo[] }>({});
   const [isLoadingVideos, setIsLoadingVideos] = useState(false);
   const [loadingSkill, setLoadingSkill] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
@@ -116,24 +114,13 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
   const fetchYouTubeVideos = async (skill: string) => {
     setIsLoadingVideos(true);
     setLoadingSkill(skill);
-    setVideoLang((prev) => ({ ...prev, [skill]: 'fr' }));
+    
     try {
-      let response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(skill)}&relevanceLanguage=fr&regionCode=FR&key=${YOUTUBE_API_KEY}`
-      );
-      let data = await response.json();
-      if (!data.items || data.items.length === 0) {
-        // Si aucune vidéo en français, chercher en anglais
-        response = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=5&q=${encodeURIComponent(skill)}&relevanceLanguage=en&regionCode=US&key=${YOUTUBE_API_KEY}`
-        );
-        data = await response.json();
-        setVideoLang((prev) => ({ ...prev, [skill]: 'en' }));
-      } else {
-        setVideoLang((prev) => ({ ...prev, [skill]: 'fr' }));
-      }
-      setYoutubeVideos((prev) => ({ ...prev, [skill]: data.items || [] }));
-    } catch (e) {
+      const result = await youtubeService.searchVideos(skill, 5);
+      setYoutubeVideos((prev) => ({ ...prev, [skill]: result.videos }));
+      setVideoLang((prev) => ({ ...prev, [skill]: result.language === 'mock' ? 'fr' : result.language }));
+    } catch (error) {
+      console.error('Error fetching YouTube videos:', error);
       setYoutubeVideos((prev) => ({ ...prev, [skill]: [] }));
       setVideoLang((prev) => ({ ...prev, [skill]: 'fr' }));
     } finally {
@@ -249,19 +236,19 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
                                 className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 py-2 px-1"
                                 style={{ scrollSnapType: 'x mandatory' }}
                               >
-                                {youtubeVideos[skill.skill].map((video: any) => (
+                                {youtubeVideos[skill.skill].map((video: YouTubeVideo) => (
                                   <div
-                                    key={video.id.videoId}
+                                    key={video.id}
                                     className="flex-shrink-0 w-48 sm:w-56 bg-blue-50 rounded-xl p-2 sm:p-3 flex flex-col items-center shadow-md"
                                     style={{ scrollSnapAlign: 'start' }}
                                   >
                                     <img
-                                      src={video.snippet.thumbnails.medium.url}
-                                      alt={video.snippet.title}
+                                      src={video.thumbnail}
+                                      alt={video.title}
                                       className="w-full h-24 sm:h-32 object-cover rounded mb-2"
                                     />
-                                    <div className="font-medium text-gray-900 text-xs sm:text-sm line-clamp-2 mb-1 text-center">{video.snippet.title}</div>
-                                    <div className="text-xs text-gray-600 mb-2 text-center">{video.snippet.channelTitle}</div>
+                                    <div className="font-medium text-gray-900 text-xs sm:text-sm line-clamp-2 mb-1 text-center">{video.title}</div>
+                                    <div className="text-xs text-gray-600 mb-2 text-center">{video.channelTitle}</div>
                                     <a
                                       onClick={e => { e.preventDefault(); setSelectedVideo(video); }}
                                       href="#"
@@ -339,17 +326,17 @@ const SkillsDevelopment: React.FC<SkillsDevelopmentProps> = ({ onNavigate }) => 
               <iframe
                 width="100%"
                 height="315"
-                src={`https://www.youtube.com/embed/${selectedVideo.id.videoId}`}
-                title={selectedVideo.snippet.title}
+                src={`https://www.youtube.com/embed/${selectedVideo.id}`}
+                title={selectedVideo.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
-            <div className="font-semibold text-gray-900 mb-1 text-base line-clamp-2">{selectedVideo.snippet.title}</div>
-            <div className="text-xs text-gray-600 mb-2">{selectedVideo.snippet.channelTitle}</div>
+            <div className="font-semibold text-gray-900 mb-1 text-base line-clamp-2">{selectedVideo.title}</div>
+            <div className="text-xs text-gray-600 mb-2">{selectedVideo.channelTitle}</div>
             <a
-              href={`https://www.youtube.com/watch?v=${selectedVideo.id.videoId}`}
+              href={selectedVideo.url}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block text-blue-600 hover:underline text-xs"

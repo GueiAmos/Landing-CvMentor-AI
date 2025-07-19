@@ -87,3 +87,20 @@ export interface UserSession {
   lastSkillPlanCVId?: string;
   forceSkillPlanRegeneration?: boolean;
 }
+
+export interface YouTubeSearchResult {
+  videos: YouTubeVideo[];
+  language: 'fr' | 'en' | 'mock';
+}
+
+export interface YouTubeVideo {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  channelTitle: string;
+  duration: string;
+  viewCount: string;
+  publishedAt: string;
+  url: string;
+}
