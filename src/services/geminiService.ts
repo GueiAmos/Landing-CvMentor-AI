@@ -392,22 +392,27 @@ IMPORTANT :
 
   async generateInterviewIntro(jobOffer: JobOffer): Promise<string> {
     const prompt = `
-Tu es un DRH expérimenté de l'entreprise "${jobOffer.company}" qui va faire passer un entretien pour le poste de "${jobOffer.title}".
+Tu es DRH AI, Directeur des Ressources Humaines expérimenté de l'entreprise "${jobOffer.company}". Tu vas faire passer un entretien pour le poste de "${jobOffer.title}".
 
-Offre d'emploi :
-Titre : ${jobOffer.title}
-Entreprise : ${jobOffer.company}
-Description : ${jobOffer.description}
+CONTEXTE DE L'ENTRETIEN :
+- Poste : ${jobOffer.title}
+- Entreprise : ${jobOffer.company}
+- Description : ${jobOffer.description}
 
-Commence l'entretien par un message d'accueil chaleureux et professionnel. Présente-toi brièvement, explique le déroulement de l'entretien et pose la première question classique pour que le candidat se présente.
+INSTRUCTIONS COMPORTEMENTALES :
+- Tu es DRH AI, ferme et professionnel
+- Parle directement, sans détours inutiles
+- Impose le respect et l'autorité d'un dirigeant
+- Sois concis mais complet
+- Commence par te présenter brièvement et demande au candidat de se présenter
 
-Ton style doit être :
-- Professionnel mais bienveillant
-- Adapté au poste et à l'entreprise
-- Encourageant pour mettre le candidat à l'aise
-- Utilise un vocabulaire simple et accessible
+STYLE REQUIS :
+- Autorité naturelle d'un DRH expérimenté
+- Fermeté professionnelle
+- Vocabulaire direct et précis
+- Pas de formules de politesse excessives
 
-Réponds directement avec ton message d'introduction, sans commentaires additionnels.
+Réponds directement avec ton message d'introduction.
 `;
 
     try {
@@ -422,40 +427,133 @@ Réponds directement avec ton message d'introduction, sans commentaires addition
 
   async interviewChatWithGemini(
     chatHistory: Array<{ role: string; content: string }>, 
-    jobOffer?: JobOffer
-  ): Promise<string> {
+    jobOffer?: JobOffer,
+    questionCount?: number
+  ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
     const contextPrompt = `
-Tu es un DRH expérimenté qui fait passer un entretien d'embauche pour le poste suivant :
+Tu es DRH AI, Directeur des Ressources Humaines expérimenté. Tu fais passer un entretien d'embauche pour :
 
 ${jobOffer ? `
-Titre : ${jobOffer.title}
-Entreprise : ${jobOffer.company}
-Description : ${jobOffer.description}
+POSTE : ${jobOffer.title}
+ENTREPRISE : ${jobOffer.company}
+DESCRIPTION : ${jobOffer.description}
 ` : 'Poste générique'}
 
-INSTRUCTIONS IMPORTANTES :
-- Tu es en entretien avec un candidat, reste dans ce rôle
-- Pose des questions pertinentes liées au poste et à l'entreprise
-- Évalue les réponses du candidat de manière constructive
-- Adapte tes questions selon les réponses précédentes
-- Sois professionnel mais bienveillant
-- Utilise un vocabulaire simple et accessible
-- Pose une seule question à la fois
-- Varie les types de questions : expérience, motivation, situations, compétences techniques
+COMPORTEMENT REQUIS :
+- Tu es DRH AI, ferme et autoritaire comme un vrai directeur
+- Parle directement, sans détours
+- Impose le respect - si le candidat est irrespectueux, recadre-le fermement
+- Tu as l'autorité et le dernier mot
+- Évalue constamment le candidat
+- Pose des questions précises et pertinentes
+- L'entretien dure 6-8 échanges maximum
+- TU DÉCIDES quand l'entretien se termine
+
+GESTION DE L'IRRESPECT :
+Si le candidat :
+- Est irrespectueux ou familier
+- Répond de manière désinvolte
+- Manque de sérieux
+→ Recadre-le immédiatement avec fermeté
+
+FIN D'ENTRETIEN :
+Après 6-8 questions, termine par : "L'entretien est terminé. Vous recevrez un rapport détaillé."
+
+NOMBRE D'ÉCHANGES ACTUELS : ${questionCount || 0}
 
 Historique de la conversation :
 ${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
 
-Réponds en tant que DRH. Pose la question suivante ou donne un feedback constructif selon le contexte.
+${(questionCount || 0) >= 6 ? 
+  'TERMINE L\'ENTRETIEN MAINTENANT avec "L\'entretien est terminé. Vous recevrez un rapport détaillé."' :
+  'Réponds en tant que DRH AI. Pose la question suivante ou recadre si nécessaire.'
+}
 `;
 
     try {
       const result = await this.model.generateContent(contextPrompt);
       const response = await result.response;
-      return response.text().trim();
+      const text = response.text().trim();
+      
+      const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
+      
+      return {
+        response: text,
+        shouldEnd,
+        finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
+      };
     } catch (error) {
       console.error('Erreur chat entretien Gemini:', error);
-      throw new Error('Erreur lors de la génération de la réponse');
+      return {
+        response: 'Erreur technique. Veuillez réessayer.',
+        shouldEnd: false
+      };
+    }
+  }
+
+  async generateInterviewReport(
+    chatHistory: Array<{ role: string; content: string }>,
+    jobOffer?: JobOffer
+  ): Promise<any> {
+    const prompt = `
+Tu es DRH AI. Analyse cet entretien d'embauche et génère un rapport détaillé.
+
+POSTE VISÉ : ${jobOffer?.title || 'Non spécifié'}
+ENTREPRISE : ${jobOffer?.company || 'Non spécifiée'}
+
+HISTORIQUE DE L'ENTRETIEN :
+${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH AI'}: ${msg.content}`).join('\n')}
+
+Génère un rapport JSON avec cette structure :
+{
+  "globalScore": number (1-10),
+  "strengths": [array de 3-4 points forts observés],
+  "weaknesses": [array de 3-4 points faibles observés],
+  "improvements": [array de 4-5 suggestions concrètes d'amélioration],
+  "trainingResources": [
+    {
+      "title": "string",
+      "type": "video|article|formation",
+      "description": "string",
+      "priority": "high|medium|low"
+    }
+  ],
+  "recommendation": "string (recommandation finale du DRH)",
+  "nextSteps": [array de 2-3 prochaines étapes recommandées]
+}
+
+CRITÈRES D'ÉVALUATION :
+- Qualité des réponses
+- Pertinence par rapport au poste
+- Communication et présentation
+- Motivation et engagement
+- Respect et professionnalisme
+
+Sois direct et constructif dans tes évaluations.
+`;
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      
+      throw new Error('Format de réponse invalide');
+    } catch (error) {
+      console.error('Erreur génération rapport:', error);
+      return {
+        globalScore: 5,
+        strengths: ["Participation à l'entretien"],
+        weaknesses: ["Analyse impossible - erreur technique"],
+        improvements: ["Réessayer l'entretien"],
+        trainingResources: [],
+        recommendation: "Entretien à refaire en raison d'une erreur technique",
+        nextSteps: ["Reprendre l'entretien"]
+      };
     }
   }
 }

@@ -10,12 +10,29 @@ interface ChatMessage {
   content: string;
 }
 
+interface InterviewReport {
+  globalScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  improvements: string[];
+  trainingResources: Array<{
+    title: string;
+    type: string;
+    description: string;
+    priority: string;
+  }>;
+  recommendation: string;
+  nextSteps: string[];
+}
 const InterviewSimulation: React.FC = () => {
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [interviewEnded, setInterviewEnded] = useState(false);
+  const [finalReport, setFinalReport] = useState<InterviewReport | null>(null);
+  const [questionCount, setQuestionCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
@@ -54,14 +71,27 @@ const InterviewSimulation: React.FC = () => {
     setInput('');
     setIsLoading(true);
     setError('');
+    
+    const newQuestionCount = questionCount + 1;
+    setQuestionCount(newQuestionCount);
+    
     try {
       const session = getSession();
       const jobOffer = session.jobOffer;
       // Construit l'historique pour Gemini
       const history = chat.map(m => ({ role: m.role, content: m.content }));
       history.push({ role: 'user', content: message });
-      const iaReply = await aiService.interviewChatWithGemini(history, jobOffer);
-      setChat((prev) => [...prev, { role: 'ia', content: iaReply }]);
+      
+      const result = await aiService.interviewChatWithGemini(history, jobOffer, newQuestionCount);
+      
+      setChat((prev) => [...prev, { role: 'ia', content: result.response }]);
+      
+      if (result.shouldEnd) {
+        setInterviewEnded(true);
+        if (result.finalReport) {
+          setFinalReport(result.finalReport);
+        }
+      }
     } catch (e) {
       setError('Erreur lors de la réponse IA.');
     } finally {

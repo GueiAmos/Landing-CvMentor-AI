@@ -383,11 +383,12 @@ Pour commencer, pourriez-vous vous présenter en quelques minutes et me parler d
 
   async interviewChatWithGemini(
     chatHistory: Array<{ role: string; content: string }>, 
-    jobOffer?: JobOffer
-  ): Promise<string> {
+    jobOffer?: JobOffer,
+    questionCount?: number
+  ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
     if (this.useRealAPI) {
       try {
-        return await geminiService.interviewChatWithGemini(chatHistory, jobOffer);
+        return await geminiService.interviewChatWithGemini(chatHistory, jobOffer, questionCount);
       } catch (error) {
         console.warn('Fallback vers réponse simulée:', error);
       }
@@ -396,16 +397,44 @@ Pour commencer, pourriez-vous vous présenter en quelques minutes et me parler d
     // Simulation locale en fallback
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const responses = [
-      "Très intéressant ! Pouvez-vous me donner un exemple concret d'un projet dont vous êtes particulièrement fier(ère) ?",
-      "C'est une expérience enrichissante. Comment gérez-vous le stress et la pression dans votre travail ?",
-      "Parfait ! Qu'est-ce qui vous motive le plus dans ce type de poste ?",
-      "Merci pour cette réponse. Pourquoi souhaitez-vous rejoindre notre entreprise spécifiquement ?",
-      "Excellent ! Avez-vous des questions sur le poste ou sur notre entreprise ?",
-      "C'est une bonne approche. Comment voyez-vous votre évolution professionnelle dans les 3 prochaines années ?"
+    const shouldEnd = (questionCount || 0) >= 6;
+    
+    if (shouldEnd) {
+      return {
+        response: "L'entretien est terminé. Vous recevrez un rapport détaillé.",
+        shouldEnd: true,
+        finalReport: {
+          globalScore: 6,
+          strengths: ["Participation active", "Réponses structurées"],
+          weaknesses: ["Manque d'exemples concrets", "Peu de questions posées"],
+          improvements: ["Préparer des exemples STAR", "Poser plus de questions sur l'entreprise"],
+          trainingResources: [
+            {
+              title: "Méthode STAR pour entretiens",
+              type: "video",
+              description: "Apprendre à structurer ses réponses",
+              priority: "high"
+            }
+          ],
+          recommendation: "Candidat à potentiel, nécessite plus de préparation",
+          nextSteps: ["S'entraîner avec la méthode STAR", "Préparer des questions sur l'entreprise"]
+        }
+      };
+    }
+    
+    const firmResponses = [
+      "Bien. Donnez-moi un exemple concret d'un projet où vous avez pris des responsabilités.",
+      "Intéressant. Comment gérez-vous la pression et les délais serrés ?",
+      "Qu'est-ce qui vous motive réellement dans ce secteur d'activité ?",
+      "Pourquoi notre entreprise plutôt qu'une autre ? Soyez précis.",
+      "Décrivez-moi une situation où vous avez dû résoudre un conflit.",
+      "Quelles sont vos attentes salariales pour ce poste ?"
     ];
     
-    return responses[Math.floor(Math.random() * responses.length)];
+    return {
+      response: firmResponses[Math.floor(Math.random() * firmResponses.length)],
+      shouldEnd: false
+    };
   }
 }
 
