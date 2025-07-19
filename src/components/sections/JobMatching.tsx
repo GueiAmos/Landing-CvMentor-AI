@@ -320,7 +320,15 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
 
       const match = await aiService.matchCVWithJob(session.cvText, completeJobOffer);
       setMatchResult(match);
-      saveSession({ cvJobMatch: match });
+      
+      // Créer un identifiant unique pour cette comparaison
+      const matchId = `${completeJobOffer.description.substring(0, 100)}_${session.cvText.substring(0, 100)}`;
+      
+      saveSession({ 
+        cvJobMatch: match,
+        lastMatchId: matchId,
+        forceSkillPlanRegeneration: true // Nouvelle comparaison = nouveau plan à générer
+      });
     } catch (err) {
       setError('Erreur lors de l\'analyse. Veuillez réessayer.');
       console.error('Job Matching Error:', err);
@@ -343,16 +351,20 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
 
   const handleGoToSkills = () => {
     const session = getSession();
-    // Identifiant unique du CV : nom + taille
-    const currentCVId = session.uploadedFile ? `${session.uploadedFile.name}_${session.uploadedFile.size}` : '';
-    // Identifiant du dernier plan généré
-    const lastSkillPlanCVId = session.lastSkillPlanCVId || '';
-    // Si le plan n'est pas à jour, forcer la régénération
-    if (currentCVId && currentCVId !== lastSkillPlanCVId) {
+    
+    // Vérifier si cette comparaison vient d'être générée
+    const currentMatchId = `${jobOffer.description?.substring(0, 100)}_${session.cvText?.substring(0, 100)}`;
+    const lastMatchId = session.lastMatchId || '';
+    
+    // Si c'est une nouvelle comparaison, forcer la régénération du plan
+    if (currentMatchId !== lastMatchId) {
       saveSession({ forceSkillPlanRegeneration: true });
+      saveSession({ lastMatchId: currentMatchId });
     } else {
+      // Si c'est la même comparaison, ne pas forcer la régénération
       saveSession({ forceSkillPlanRegeneration: false });
     }
+    
     onNavigate && onNavigate('skills');
   };
 
@@ -406,28 +418,18 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
             <p className="text-green-800 text-xs sm:text-sm mb-3">Ce sont les compétences de votre CV qui correspondent aux attentes de l'offre d'emploi.</p>
             <div className="space-y-2">
               {(() => {
-                // Intersection réelle si possible
-                let aligned: string[] = [];
-                if (matchResult.cvSkills && matchResult.offerSkills) {
-                  const cvSkills = matchResult.cvSkills.map((s: string) => String(s || '').trim().toLowerCase());
-                  const offerSkills = matchResult.offerSkills.map((s: string) => String(s || '').trim().toLowerCase());
-                  aligned = cvSkills.filter(skill => offerSkills.includes(skill));
-                  // Optionnel : recouper avec alignedSkills du backend si dispo
-                  if (matchResult.alignedSkills) {
-                    const backendAligned = matchResult.alignedSkills.map((s: string) => String(s || '').trim().toLowerCase());
-                    aligned = aligned.filter(skill => backendAligned.includes(skill));
-                  }
-                } else if (matchResult.alignedSkills) {
-                  aligned = matchResult.alignedSkills;
-                }
+                // Utiliser directement les compétences alignées du résultat de matching
+                const aligned = matchResult.alignedSkills || [];
+                
                 if (aligned.length === 0) {
-                  return <div className="text-xs text-orange-600">Aucune compétence commune détectée entre votre CV et l'offre.</div>;
+                  return <div className="text-xs text-orange-600">Aucun point fort identifié pour ce poste.</div>;
                 }
+                
                 return aligned.map((skill, index) => (
-                <div key={index} className="flex items-center bg-green-100 rounded-lg p-3">
-                  <Target className="h-4 w-4 text-green-600 mr-2" />
+                  <div key={index} className="flex items-center bg-green-100 rounded-lg p-3">
+                    <Target className="h-4 w-4 text-green-600 mr-2" />
                     <MarkdownRenderer content={skill} className="text-green-800 font-medium text-sm" />
-                </div>
+                  </div>
                 ));
               })()}
             </div>

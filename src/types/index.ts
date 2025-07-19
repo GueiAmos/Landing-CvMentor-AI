@@ -86,6 +86,7 @@ export interface UserSession {
   skillGaps?: SkillGap[];
   lastSkillPlanCVId?: string;
   forceSkillPlanRegeneration?: boolean;
+  lastMatchId?: string;
 }
 
 export interface YouTubeSearchResult {
