@@ -10,6 +10,8 @@ class GeminiService {
   private liveModelWithVoice: any;
   private nativeAudioModel: any;
   private ttsModel: any;
+  private interviewGenAI: GoogleGenerativeAI;
+  private interviewModel: any;
 
   constructor() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -19,12 +21,17 @@ class GeminiService {
       throw new Error('Clé API Gemini manquante');
     }
     
+    // Instance principale pour analyse CV, matching, développement compétences
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     this.audioModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     this.liveModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash-live-preview' });
     
-    // Instance séparée pour le mode live avec la nouvelle clé
+    // Instance séparée pour simulation d'entretien et lettres de motivation
+    this.interviewGenAI = new GoogleGenerativeAI(liveApiKey);
+    this.interviewModel = this.interviewGenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    
+    // Instance pour le mode live avec la clé spécialisée
     this.liveGenAI = new GoogleGenerativeAI(liveApiKey);
     this.liveModelWithVoice = this.liveGenAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash-live-preview',
@@ -264,7 +271,7 @@ Répondez uniquement avec le contenu de la lettre, sans commentaires additionnel
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.interviewModel.generateContent(prompt);
       const response = await result.response;
       const content = response.text().trim();
       
@@ -315,7 +322,7 @@ IMPORTANT :
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.interviewModel.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
@@ -365,7 +372,7 @@ IMPORTANT :
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.interviewModel.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
@@ -470,7 +477,7 @@ IMPORTANT : Commence par des questions de présentation/motivation, pas techniqu
 `;
 
     try {
-      const modelToUse = isLiveMode ? this.nativeAudioModel : this.model;
+      const modelToUse = isLiveMode ? this.nativeAudioModel : this.interviewModel;
       const result = await modelToUse.generateContent(prompt);
       const response = await result.response;
       return response.text().trim();
@@ -534,7 +541,7 @@ ${(questionCount || 0) >= 6 ?
 `;
 
     try {
-      const result = await this.model.generateContent(contextPrompt);
+      const result = await this.interviewModel.generateContent(contextPrompt);
       const response = await result.response;
       const text = response.text().trim();
       
@@ -630,7 +637,7 @@ ${(questionCount || 0) >= 6 ?
 
       // Utiliser le modèle standard pour traiter l'audio entrant
       console.log('Envoi de l\'audio au modèle Gemini...');
-      const result = await this.model.generateContent([
+      const result = await this.interviewModel.generateContent([
         contextPrompt,
         {
           inlineData: {
