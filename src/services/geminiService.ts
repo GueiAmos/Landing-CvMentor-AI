@@ -1,18 +1,48 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { CVAnalysis, JobOffer, CVJobMatch, CoverLetter, InterviewQuestion, InterviewFeedback, SkillGap } from '../types';
+import { CVAnalysis, JobOffer, CVJobMatch, CoverLetter, InterviewQuestion, InterviewFeedback, SkillGap, InterviewResponse } from '../types';
 
 class GeminiService {
   private genAI: GoogleGenerativeAI;
   private model: any;
+  private audioModel: any;
+  private liveModel: any;
+  private liveGenAI: GoogleGenerativeAI;
+  private liveModelWithVoice: any;
+  private nativeAudioModel: any;
 
   constructor() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    const liveApiKey = import.meta.env.VITE_GEMINI_LIVE_API_KEY || apiKey;
+    
     if (!apiKey) {
       throw new Error('Clé API Gemini manquante');
     }
     
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    this.audioModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    this.liveModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash-live-preview' });
+    
+    // Instance séparée pour le mode live avec la nouvelle clé
+    this.liveGenAI = new GoogleGenerativeAI(liveApiKey);
+    this.liveModelWithVoice = this.liveGenAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash-live-preview',
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+      }
+    });
+    
+    // Nouveau modèle spécialisé pour l'audio natif avec sortie audio automatique
+    this.nativeAudioModel = this.liveGenAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash-preview-tts',
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+      }
+    });
   }
 
   async analyzeCV(cvText: string): Promise<CVAnalysis> {
@@ -345,20 +375,21 @@ IMPORTANT :
 Créez un plan de développement des compétences pour ces lacunes identifiées :
 ${gaps.join(', ')}
 
-Fournissez un plan au format JSON :
+Fournissez un plan au format JSON avec des ressources variées :
 {
   "skillGaps": [
     {
       "skill": "string",
       "importance": "high|medium|low",
-      "estimatedTime": "string",
+      "estimatedTime": "string (ex: 3 à 6 mois)",
       "resources": [
         {
           "title": "string",
-          "type": "video|course|article|certification",
-          "url": "string",
+          "type": "video|course|article|certification|ebook|blog|website|community",
+          "url": "string (URL réelle si possible)",
           "difficulty": "beginner|intermediate|advanced",
-          "duration": "string"
+          "duration": "string",
+          "description": "string (description courte de la ressource)"
         }
       ]
     }
@@ -366,10 +397,14 @@ Fournissez un plan au format JSON :
 }
 
 IMPORTANT :
+- Proposez des ressources variées : vidéos YouTube, cours en ligne (Coursera, Udemy, OpenClassrooms), articles de blog, e-books, sites web spécialisés, communautés LinkedIn, certifications
+- Incluez des ressources gratuites et payantes
+- Mentionnez des plateformes connues : Coursera, Udemy, LinkedIn Learning, OpenClassrooms, YouTube, blogs spécialisés
+- Ajoutez des ressources en français quand possible
+- Donnez des URLs réelles quand c'est possible
 - Utilisez un vocabulaire simple et accessible
-- Mettez les éléments importants entre **double astérisques**
-- Proposez des ressources gratuites ou peu coûteuses
 - Donnez des conseils pratiques et réalisables
+- Estimez le temps de développement de manière réaliste
 `;
 
     try {
@@ -390,38 +425,47 @@ IMPORTANT :
     }
   }
 
-  async generateInterviewIntro(jobOffer: JobOffer): Promise<string> {
+  async generateInterviewIntro(jobOffer: JobOffer, isLiveMode: boolean = false): Promise<string> {
     const prompt = `
-Tu es DRH AI, Directeur des Ressources Humaines expérimenté de l'entreprise "${jobOffer.company}". Tu vas faire passer un entretien pour le poste de "${jobOffer.title}".
+Tu es un(e) DRH expérimenté(e) et professionnel(le) qui mène un entretien d'embauche${isLiveMode ? ' avec le modèle gemini-live-2.5-flash-preview' : ''}. Ton rôle est d'évaluer les compétences, l'expérience et la personnalité du candidat pour un poste spécifique.
 
 CONTEXTE DE L'ENTRETIEN :
-- Poste : ${jobOffer.title}
-- Entreprise : ${jobOffer.company}
-- Description : ${jobOffer.description}
+- POSTE : ${jobOffer.title}
+- ENTREPRISE : ${jobOffer.company}
+- DESCRIPTION DU POSTE : ${jobOffer.description}
+- COMPÉTENCES REQUISES : ${jobOffer.skills.join(', ')}
 
-INSTRUCTIONS COMPORTEMENTALES :
-- Tu es DRH AI, ferme et professionnel
-- Parle directement, sans détours inutiles
-- Impose le respect et l'autorité d'un dirigeant
-- Sois concis mais complet
-- Commence par te présenter brièvement et demande au candidat de se présenter
+INSTRUCTIONS :
+- Commence par une brève présentation personnalisée (1-2 phrases)
+- Pose des questions ouvertes pour encourager le dialogue
+- Suis les réponses du candidat avec des questions de clarification ou d'approfondissement
+- Maintiens un ton neutre mais encourageant
+- Évite les questions techniques au début
+- Maximum 4-5 phrases au total
+- Mentionne le poste et l'entreprise dans ton message
+${isLiveMode ? '- Optimise pour l\'audio natif : phrases courtes, claires, rythmées' : ''}
+${isLiveMode ? '- Utilise la synthèse vocale native du modèle gemini-live-2.5-flash-preview' : ''}
 
-STYLE REQUIS :
-- Autorité naturelle d'un DRH expérimenté
-- Fermeté professionnelle
-- Vocabulaire direct et précis
-- Pas de formules de politesse excessives
+EXEMPLES DE QUESTIONS DE DÉBUT :
+- "Pouvez-vous vous présenter en quelques minutes et me parler de votre parcours ?"
+- "Qu'est-ce qui vous a motivé à postuler chez [Entreprise] pour ce poste ?"
+- "Parlez-moi de votre expérience professionnelle et de ce qui vous intéresse dans ce secteur"
+- "Pourquoi ce poste de [Poste] vous semble-t-il correspondre à votre profil ?"
 
-Réponds directement avec ton message d'introduction.
+EXEMPLE DE FORMAT :
+"Bonjour ! Je suis [Nom], DRH chez [Entreprise]. Je suis ravi(e) de vous rencontrer pour le poste de [Poste spécifique]. Pouvez-vous vous présenter en quelques minutes et me parler de votre parcours professionnel ?"
+
+IMPORTANT : Commence par des questions de présentation/motivation, pas techniques. Sois naturel et encourage le dialogue.
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const modelToUse = isLiveMode ? this.nativeAudioModel : this.model;
+      const result = await modelToUse.generateContent(prompt);
       const response = await result.response;
       return response.text().trim();
     } catch (error) {
       console.error('Erreur génération intro entretien Gemini:', error);
-      throw new Error('Erreur lors de la génération de l\'introduction');
+      return 'Bonjour ! Je suis votre DRH IA. Prêt(e) pour l\'entretien ?';
     }
   }
 
@@ -429,50 +473,52 @@ Réponds directement avec ton message d'introduction.
     chatHistory: Array<{ role: string; content: string }>, 
     jobOffer?: JobOffer,
     questionCount?: number,
-    audioBlob?: Blob
-  ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
-    // Si on a un blob audio, on l'utilise directement avec Gemini
+    audioBlob?: Blob,
+    isLiveMode: boolean = false
+  ): Promise<InterviewResponse> {
+    // Si on a un blob audio, utiliser le bon modèle selon le mode
     if (audioBlob) {
-      return this.processAudioMessage(chatHistory, jobOffer, questionCount, audioBlob);
+      return this.processAudioMessage(chatHistory, jobOffer, questionCount, audioBlob, isLiveMode);
     }
 
     const contextPrompt = `
-Tu es DRH AI, Directeur des Ressources Humaines expérimenté. Tu fais passer un entretien d'embauche pour :
+Tu es un(e) DRH expérimenté(e) et professionnel(le) qui mène un entretien d'embauche. Ton rôle est d'évaluer les compétences, l'expérience et la personnalité du candidat pour un poste spécifique.
 
-${jobOffer ? `
-POSTE : ${jobOffer.title}
-ENTREPRISE : ${jobOffer.company}
-DESCRIPTION : ${jobOffer.description}
-` : 'Poste générique'}
+CONTEXTE DU POSTE :
+- POSTE : ${jobOffer?.title || 'Poste générique'}
+- ENTREPRISE : ${jobOffer?.company || 'Entreprise'}
+- DESCRIPTION : ${jobOffer?.description || 'Description non disponible'}
+- COMPÉTENCES REQUISES : ${jobOffer?.skills?.join(', ') || 'Compétences non spécifiées'}
 
-COMPORTEMENT REQUIS :
-- Tu es DRH AI, ferme et autoritaire comme un vrai directeur
-- Parle directement, sans détours
-- Impose le respect - si le candidat est irrespectueux, recadre-le fermement
-- Tu as l'autorité et le dernier mot
-- Évalue constamment le candidat
-- Pose des questions précises et pertinentes
-- L'entretien dure 6-8 échanges maximum
-- TU DÉCIDES quand l'entretien se termine
+RÈGLES STRICTES :
+- Pose des questions ouvertes pour encourager le dialogue
+- Suis les réponses du candidat avec des questions de clarification ou d'approfondissement
+- Maintiens un ton neutre mais encourageant
+- Réponses COURTES (max 2-3 phrases)
+- Questions PERSONNALISÉES selon le poste et les compétences requises
+- 6-8 échanges maximum
+- Termine par : "L'entretien est terminé."
+- Évite les questions génériques, adapte-les au contexte du poste
+- Utilise les compétences requises pour personnaliser tes questions
 
-GESTION DE L'IRRESPECT :
-Si le candidat :
-- Est irrespectueux ou familier
-- Répond de manière désinvolte
-- Manque de sérieux
-→ Recadre-le immédiatement avec fermeté
+PROGRESSION DE L'ENTRETIEN :
+- Échanges 1-2 : Questions de présentation et motivation
+- Échanges 3-4 : Questions sur l'expérience et le parcours
+- Échanges 5-6 : Questions techniques/compétences spécifiques au poste
+- Échanges 7+ : Questions de fin (motivations, attentes, questions du candidat)
 
-FIN D'ENTRETIEN :
-Après 6-8 questions, termine par : "L'entretien est terminé. Vous recevrez un rapport détaillé."
+NOMBRE D'ÉCHANGES : ${questionCount || 0}
 
-NOMBRE D'ÉCHANGES ACTUELS : ${questionCount || 0}
-
-Historique de la conversation :
+Historique :
 ${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
 
 ${(questionCount || 0) >= 6 ? 
-  'TERMINE L\'ENTRETIEN MAINTENANT avec "L\'entretien est terminé. Vous recevrez un rapport détaillé."' :
-  'Réponds en tant que DRH AI. Pose la question suivante ou recadre si nécessaire.'
+  'TERMINE : "L\'entretien est terminé."' :
+  questionCount === 1 || questionCount === 2 ? 
+    'Pose une question de présentation ou motivation (ex: parcours, motivations, pourquoi cette entreprise)' :
+    questionCount === 3 || questionCount === 4 ? 
+      'Pose une question sur l\'expérience et le parcours professionnel' :
+      'Pose une question technique ou sur les compétences spécifiques au poste. Utilise les compétences requises pour personnaliser.'
 }
 `;
 
@@ -483,8 +529,23 @@ ${(questionCount || 0) >= 6 ?
       
       const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
       
+      // Convertir la réponse textuelle en audio avec le modèle TTS
+      let generatedAudioBlob: Blob | null = null;
+      try {
+        console.log('Génération audio pour la réponse du DRH...');
+        generatedAudioBlob = await this.convertTextToSpeech(text);
+        if (generatedAudioBlob) {
+          console.log('Audio généré avec succès pour la réponse du DRH');
+        } else {
+          console.warn('Échec de la génération audio, utilisation du texte uniquement');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la génération audio:', error);
+      }
+      
       return {
         response: text,
+        audioBlob: generatedAudioBlob || undefined,
         shouldEnd,
         finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
       };
@@ -501,60 +562,69 @@ ${(questionCount || 0) >= 6 ?
     chatHistory: Array<{ role: string; content: string }>,
     jobOffer?: JobOffer,
     questionCount?: number,
-    audioBlob?: Blob
-  ): Promise<{ response: string; shouldEnd: boolean; finalReport?: any }> {
+    audioBlob?: Blob,
+    isLiveMode: boolean = false
+  ): Promise<InterviewResponse> {
     try {
       // Convertir le blob audio en base64
       const audioBase64 = await this.blobToBase64(audioBlob!);
       
       const contextPrompt = `
-Tu es DRH AI, Directeur des Ressources Humaines expérimenté. Tu fais passer un entretien d'embauche pour :
+Tu es un(e) DRH expérimenté(e) et professionnel(le) qui mène un entretien d'embauche en temps réel avec le modèle gemini-live-2.5-flash-preview. Ton rôle est d'évaluer les compétences, l'expérience et la personnalité du candidat pour un poste spécifique.
 
-${jobOffer ? `
-POSTE : ${jobOffer.title}
-ENTREPRISE : ${jobOffer.company}
-DESCRIPTION : ${jobOffer.description}
-` : 'Poste générique'}
+CONTEXTE DU POSTE :
+- POSTE : ${jobOffer?.title || 'Poste générique'}
+- ENTREPRISE : ${jobOffer?.company || 'Entreprise'}
+- DESCRIPTION : ${jobOffer?.description || 'Description non disponible'}
+- COMPÉTENCES REQUISES : ${jobOffer?.skills?.join(', ') || 'Compétences non spécifiées'}
 
-COMPORTEMENT REQUIS :
-- Tu es DRH AI, ferme et autoritaire comme un vrai directeur
-- Parle directement, sans détours
-- Impose le respect - si le candidat est irrespectueux, recadre-le fermement
-- Tu as l'autorité et le dernier mot
-- Évalue constamment le candidat
-- Pose des questions précises et pertinentes
-- L'entretien dure 6-8 échanges maximum
-- TU DÉCIDES quand l'entretien se termine
+RÈGLES STRICTES POUR CONVERSATION LIVE BIDIRECTIONNELLE :
+- Pose des questions ouvertes pour encourager le dialogue
+- Suis les réponses du candidat avec des questions de clarification ou d'approfondissement
+- Maintiens un ton neutre mais encourageant
+- Réponses COURTES et NATURELLES (max 2-3 phrases)
+- Questions PERSONNALISÉES selon le poste
+- 6-8 échanges maximum
+- Termine par : "L'entretien est terminé."
+- Utilise la synthèse vocale native du modèle gemini-live-2.5-flash-preview
+- Parle de manière naturelle et conversationnelle
+- Évite les questions génériques, adapte-les au contexte du poste
+- Optimise pour l'audio natif : phrases courtes, claires, rythmées
+- Réponds instantanément pour une conversation fluide
+- IMPORTANT : Ta réponse sera automatiquement lue en audio, optimise pour la synthèse vocale
 
-GESTION DE L'IRRESPECT :
-Si le candidat :
-- Est irrespectueux ou familier
-- Répond de manière désinvolte
-- Manque de sérieux
-→ Recadre-le immédiatement avec fermeté
+PROGRESSION DE L'ENTRETIEN :
+- Échanges 1-2 : Questions de présentation et motivation
+- Échanges 3-4 : Questions sur l'expérience et le parcours
+- Échanges 5-6 : Questions techniques/compétences spécifiques au poste
+- Échanges 7+ : Questions de fin (motivations, attentes, questions du candidat)
 
-FIN D'ENTRETIEN :
-Après 6-8 questions, termine par : "L'entretien est terminé. Vous recevrez un rapport détaillé."
+NOMBRE D'ÉCHANGES : ${questionCount || 0}
 
-NOMBRE D'ÉCHANGES ACTUELS : ${questionCount || 0}
-
-Historique de la conversation :
+Historique :
 ${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
 
-Le candidat vient de t'envoyer un message vocal. Écoute-le et réponds en conséquence.
+Message vocal reçu. Réponds instantanément avec la synthèse vocale native du modèle gemini-live-2.5-flash-preview. Ta réponse sera automatiquement lue en audio.
 
 ${(questionCount || 0) >= 6 ? 
-  'TERMINE L\'ENTRETIEN MAINTENANT avec "L\'entretien est terminé. Vous recevrez un rapport détaillé."' :
-  'Réponds en tant que DRH AI. Pose la question suivante ou recadre si nécessaire.'
+  'TERMINE : "L\'entretien est terminé."' :
+  questionCount === 1 || questionCount === 2 ? 
+    'Pose une question de présentation ou motivation (ex: parcours, motivations, pourquoi cette entreprise)' :
+    questionCount === 3 || questionCount === 4 ? 
+      'Pose une question sur l\'expérience et le parcours professionnel' :
+      'Pose une question technique ou sur les compétences spécifiques au poste. Utilise les compétences requises pour personnaliser.'
 }
 `;
 
-      const result = await this.model.generateContent([
+      // Utiliser le modèle audio natif pour le mode live
+      const modelToUse = isLiveMode ? this.nativeAudioModel : this.model;
+      
+      const result = await modelToUse.generateContent([
         contextPrompt,
         {
           inlineData: {
             data: audioBase64,
-            mimeType: 'audio/wav'
+            mimeType: 'audio/webm'
           }
         }
       ]);
@@ -564,13 +634,28 @@ ${(questionCount || 0) >= 6 ?
       
       const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
       
+      // Convertir la réponse textuelle en audio avec le modèle TTS
+      let generatedAudioBlob: Blob | null = null;
+      try {
+        console.log('Génération audio pour la réponse du DRH (mode audio)...');
+        generatedAudioBlob = await this.convertTextToSpeech(text);
+        if (generatedAudioBlob) {
+          console.log('Audio généré avec succès pour la réponse du DRH');
+        } else {
+          console.warn('Échec de la génération audio, utilisation du texte uniquement');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la génération audio:', error);
+      }
+      
       return {
         response: text,
+        audioBlob: generatedAudioBlob || undefined,
         shouldEnd,
         finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
       };
     } catch (error) {
-      console.error('Erreur traitement audio Gemini:', error);
+      console.error('Erreur traitement audio Gemini Native Audio:', error);
       return {
         response: 'Je n\'ai pas pu comprendre votre message vocal. Pouvez-vous répéter ou écrire votre réponse ?',
         shouldEnd: false
@@ -590,6 +675,34 @@ ${(questionCount || 0) >= 6 ?
       reader.onerror = () => reject(new Error('Erreur lors de la conversion audio'));
       reader.readAsDataURL(blob);
     });
+  }
+
+  // Convertir le texte en audio avec le modèle TTS et la voix Orus
+  async convertTextToSpeech(text: string): Promise<Blob | null> {
+    try {
+      console.log('Conversion texte vers audio avec gemini-2.5-flash-preview-tts et voix Orus...');
+      
+      const result = await this.nativeAudioModel.generateContent([
+        {
+          text: text,
+          voice: "Orus"
+        }
+      ]);
+      
+      const response = await result.response;
+      
+      // Le modèle TTS devrait retourner de l'audio
+      if (response.audio) {
+        console.log('Audio généré avec succès avec la voix Orus');
+        return response.audio;
+      } else {
+        console.warn('Aucun audio retourné par le modèle TTS');
+        return null;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la conversion texte vers audio:', error);
+      return null;
+    }
   }
 
   async generateInterviewReport(

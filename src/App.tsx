@@ -6,7 +6,7 @@ import CVAnalysis from './components/sections/CVAnalysis';
 import JobMatching from './components/sections/JobMatching';
 import CoverLetter from './components/sections/CoverLetter';
 import InterviewSimulation from './components/sections/InterviewSimulation';
-import SkillsDevelopment from './components/sections/SkillsDevelopment';
+import LearningPath from './components/sections/LearningPath';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
@@ -29,7 +29,7 @@ function App() {
       case 'interview':
         return <InterviewSimulation />;
       case 'skills':
-        return <SkillsDevelopment onNavigate={handleNavigate} />;
+        return <LearningPath onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }
@@ -39,7 +39,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Header currentSection={currentSection} onNavigate={handleNavigate} />
-        <main>
+        <main className="pt-16 sm:pt-20">
           {renderCurrentSection()}
         </main>
       </div>

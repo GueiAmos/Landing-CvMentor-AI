@@ -47,6 +47,13 @@ export interface InterviewFeedback {
   improvements: string[];
 }
 
+export interface InterviewResponse {
+  response: string;
+  audioBlob?: Blob;
+  shouldEnd: boolean;
+  finalReport?: any;
+}
+
 export interface SkillGap {
   skill: string;
   importance: 'high' | 'medium' | 'low';
@@ -56,11 +63,11 @@ export interface SkillGap {
 
 export interface Resource {
   title: string;
-  type: 'video' | 'course' | 'article' | 'certification';
+  type: 'video' | 'course' | 'article' | 'certification' | 'ebook' | 'blog' | 'website' | 'community';
   url: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   duration: string;
-  description: string;
+  description?: string;
 }
 
 export interface UploadedFile {
