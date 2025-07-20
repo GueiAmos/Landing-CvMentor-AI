@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
             className="flex items-center cursor-pointer group"
             onClick={() => onNavigate('home')}
           >
-            <div className="relative group-hover:scale-110 transition-all duration-300">
+            <div className="relative">
               <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center mr-2 sm:mr-3 ">
                 <img 
                   src={logo} 
@@ -37,13 +37,13 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
               </div>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold group-hover:scale-105 transition-all duration-300 hidden sm:block">
+              <h1 className="text-xl sm:text-2xl font-bold hidden sm:block">
                 <span className="text-orange-500">C</span>
                 <span className="text-blue-600">v</span>
                 <span className="text-orange-500">Mentor</span>
                 <span className="text-blue-600"> AI</span>
               </h1>
-              <p className="text-sm text-gray-500 hidden sm:block group-hover:text-blue-500 transition-colors duration-300">
+              <p className="text-sm text-gray-500 hidden sm:block  duration-300">
                 Optimisez votre candidature
               </p>
             </div>
