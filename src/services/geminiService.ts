@@ -9,7 +9,6 @@ class GeminiService {
   private liveGenAI: GoogleGenerativeAI;
   private liveModelWithVoice: any;
   private nativeAudioModel: any;
-  private ttsModel: any;
   private interviewGenAI: GoogleGenerativeAI;
   private interviewModel: any;
 
@@ -44,16 +43,6 @@ class GeminiService {
     
     // Modèle pour traiter l'audio entrant (reconnaissance vocale)
     this.nativeAudioModel = this.liveGenAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-      }
-    });
-    
-    // Modèle TTS pour générer l'audio de réponse
-    this.ttsModel = this.liveGenAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.7,
@@ -547,23 +536,8 @@ ${(questionCount || 0) >= 6 ?
       
       const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
       
-      // Convertir la réponse textuelle en audio avec le modèle TTS
-      let generatedAudioBlob: Blob | null = null;
-      try {
-        console.log('Génération audio pour la réponse du DRH...');
-        generatedAudioBlob = await this.convertTextToSpeech(text);
-        if (generatedAudioBlob) {
-          console.log('Audio généré avec succès pour la réponse du DRH');
-        } else {
-          console.warn('Échec de la génération audio, utilisation du texte uniquement');
-        }
-      } catch (error) {
-        console.error('Erreur lors de la génération audio:', error);
-      }
-      
       return {
         response: text,
-        audioBlob: generatedAudioBlob || undefined,
         shouldEnd,
         finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
       };
@@ -653,23 +627,8 @@ ${(questionCount || 0) >= 6 ?
       
       const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
       
-      // Convertir la réponse textuelle en audio avec le modèle TTS
-      let generatedAudioBlob: Blob | null = null;
-      try {
-        console.log('Génération audio pour la réponse du DRH (mode audio)...');
-        generatedAudioBlob = await this.convertTextToSpeech(text);
-        if (generatedAudioBlob) {
-          console.log('Audio généré avec succès pour la réponse du DRH');
-        } else {
-          console.warn('Échec de la génération audio, utilisation du texte uniquement');
-        }
-      } catch (error) {
-        console.error('Erreur lors de la génération audio:', error);
-      }
-      
       return {
         response: text,
-        audioBlob: generatedAudioBlob || undefined,
         shouldEnd,
         finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
       };
@@ -708,34 +667,6 @@ ${(questionCount || 0) >= 6 ?
       reader.onerror = () => reject(new Error('Erreur lors de la conversion audio'));
       reader.readAsDataURL(blob);
     });
-  }
-
-  // Convertir le texte en audio avec le modèle TTS et la voix Orus
-  async convertTextToSpeech(text: string): Promise<Blob | null> {
-    try {
-      console.log('Conversion texte vers audio avec gemini-2.5-flash-preview-tts et voix Orus...');
-      
-      const result = await this.ttsModel.generateContent([
-        {
-          text: text,
-          voice: "Orus"
-        }
-      ]);
-      
-      const response = await result.response;
-      
-      // Le modèle TTS devrait retourner de l'audio
-      if (response.audio) {
-        console.log('Audio généré avec succès avec la voix Orus');
-        return response.audio;
-      } else {
-        console.warn('Aucun audio retourné par le modèle TTS');
-        return null;
-      }
-    } catch (error) {
-      console.error('Erreur lors de la conversion texte vers audio:', error);
-      return null;
-    }
   }
 
   async generateInterviewReport(
