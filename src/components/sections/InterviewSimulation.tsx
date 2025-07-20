@@ -365,7 +365,7 @@ const InterviewSimulation: React.FC = () => {
         
         return result;
       } else {
-        // Mode Discussion Live : réponse audio automatique avec voix Orus
+        // Mode Discussion Live : réponse audio automatique
         result = await aiService.interviewChatWithGemini(history, jobOffer, newQuestionCount, audioBlob, true);
         
         // Mettre à jour le message utilisateur (enlever l'état d'envoi)
@@ -382,7 +382,7 @@ const InterviewSimulation: React.FC = () => {
         // Ajouter la réponse IA - si audio généré, afficher seulement l'audio, sinon le texte
         setChat((prev) => [...prev, { 
           role: 'ia', 
-          content: result.audioBlob ? "🎧 Message vocal du DRH (voix Orus)" : result.response,
+          content: result.audioBlob ? "🎧 Message vocal du DRH" : result.response,
           audioBlob: result.audioBlob,
           audioUrl: responseAudioUrl,
           isAudioMessage: !!result.audioBlob,
@@ -391,7 +391,7 @@ const InterviewSimulation: React.FC = () => {
         
         // Lecture automatique de l'audio si disponible
         if (result.audioBlob && responseAudioUrl) {
-          console.log('Lecture automatique de la réponse audio du DRH avec voix Orus...');
+          console.log('Lecture automatique de la réponse audio du DRH...');
           setTimeout(() => {
             const audio = new Audio(responseAudioUrl);
             audio.play().catch(error => {
@@ -557,6 +557,29 @@ const InterviewSimulation: React.FC = () => {
     }
   };
 
+  // Fonction pour arrêter l'audio d'un message spécifique
+  const stopAudioForMessage = (messageIndex: number) => {
+    const audioKey = `audio_${messageIndex}`;
+    if (audioRefs.current[audioKey]) {
+      audioRefs.current[audioKey].pause();
+      audioRefs.current[audioKey].currentTime = 0;
+    }
+    if (playingAudio === audioKey) {
+      setPlayingAudio(null);
+      setAudioProgress(prev => ({ ...prev, [audioKey]: 0 }));
+    }
+  };
+
+  // Fonction pour arrêter tous les audios en cours
+  const stopAllAudio = useCallback(() => {
+    Object.values(audioRefs.current).forEach(audio => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    setPlayingAudio(null);
+    setAudioProgress({});
+  }, []);
+
   // Nettoyage des URLs d'objets lors du démontage
   useEffect(() => {
     return () => {
@@ -565,15 +588,47 @@ const InterviewSimulation: React.FC = () => {
           URL.revokeObjectURL(msg.audioUrl);
         }
       });
-      Object.values(audioRefs.current).forEach(audio => {
-        audio.pause();
-      });
-
+      stopAllAudio();
     };
-  }, []);
+  }, [stopAllAudio]);
+
+  // Arrêter l'audio quand on change de mode ou de vue
+  useEffect(() => {
+    stopAllAudio();
+  }, [mode, sessionStarted, interviewEnded, stopAllAudio]);
+
+  // Arrêter l'audio quand l'utilisateur quitte la page ou change d'onglet
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAllAudio();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      stopAllAudio();
+    };
+
+    // Arrêter l'audio quand l'utilisateur navigue vers une autre section
+    const handlePopState = () => {
+      stopAllAudio();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+      stopAllAudio(); // Arrêter l'audio lors du démontage du composant
+    };
+  }, [stopAllAudio]);
 
   // Annulation/reinitialisation
   const resetSession = () => {
+    stopAllAudio(); // Arrêter tous les audios en cours
     setSessionStarted(false);
     setMode(null);
     setChat([]);
@@ -812,24 +867,7 @@ const InterviewSimulation: React.FC = () => {
                 <p className="text-gray-600 text-sm mb-4">
                   Questions automatiques générées selon l'offre. Répondez par texte ou vocal avec prévisualisation.
                 </p>
-                <div className="space-y-2 text-xs text-gray-500">
-                  <div className="flex items-center justify-center">
-                    <MessageCircle className="h-3 w-3 mr-1" />
-                    <span>Questions automatiques</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Mic className="h-3 w-3 mr-1" />
-                    <span>Réponses texte/vocal</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    <span>Prévisualisation audio</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>Rapport final</span>
-                  </div>
-                </div>
+                
               </div>
             </div>
 
@@ -841,26 +879,9 @@ const InterviewSimulation: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Discussion Live</h3>
                 <p className="text-gray-600 text-sm mb-4">
-                  Conversation naturelle avec le DRH. Réponses audio automatiques avec voix Orus.
+                  Conversation naturelle avec le DRH. Réponses audio automatiques.
                 </p>
-                <div className="space-y-2 text-xs text-gray-500">
-                  <div className="flex items-center justify-center">
-                    <Mic className="h-3 w-3 mr-1" />
-                    <span>Conversation naturelle</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Brain className="h-3 w-3 mr-1" />
-                    <span>Réponses audio automatiques</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Play className="h-3 w-3 mr-1" />
-                    <span>Voix Orus du DRH</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <Loader2 className="h-3 w-3 mr-1" />
-                    <span>Rapport détaillé</span>
-                  </div>
-                </div>
+                
               </div>
             </div>
           </div>

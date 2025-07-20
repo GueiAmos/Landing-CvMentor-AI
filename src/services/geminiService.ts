@@ -9,6 +9,7 @@ class GeminiService {
   private liveGenAI: GoogleGenerativeAI;
   private liveModelWithVoice: any;
   private nativeAudioModel: any;
+  private ttsModel: any;
 
   constructor() {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -34,8 +35,18 @@ class GeminiService {
       }
     });
     
-    // Nouveau modèle spécialisé pour l'audio natif avec sortie audio automatique
+    // Modèle pour traiter l'audio entrant (reconnaissance vocale)
     this.nativeAudioModel = this.liveGenAI.getGenerativeModel({ 
+      model: 'gemini-2.5-flash-live-preview',
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+      }
+    });
+    
+    // Modèle TTS pour générer l'audio de réponse
+    this.ttsModel = this.liveGenAI.getGenerativeModel({ 
       model: 'gemini-2.5-flash-preview-tts',
       generationConfig: {
         temperature: 0.7,
@@ -566,11 +577,14 @@ ${(questionCount || 0) >= 6 ?
     isLiveMode: boolean = false
   ): Promise<InterviewResponse> {
     try {
+      console.log('Début du traitement audio, taille du blob:', audioBlob?.size, 'bytes');
+      
       // Convertir le blob audio en base64
       const audioBase64 = await this.blobToBase64(audioBlob!);
+      console.log('Audio converti en base64, longueur:', audioBase64.length);
       
       const contextPrompt = `
-Tu es un(e) DRH expérimenté(e) et professionnel(le) qui mène un entretien d'embauche en temps réel avec le modèle gemini-live-2.5-flash-preview. Ton rôle est d'évaluer les compétences, l'expérience et la personnalité du candidat pour un poste spécifique.
+Tu es un(e) DRH expérimenté(e) et professionnel(le) qui mène un entretien d'embauche. Tu reçois un message vocal du candidat et tu dois y répondre de manière appropriée.
 
 CONTEXTE DU POSTE :
 - POSTE : ${jobOffer?.title || 'Poste générique'}
@@ -578,20 +592,18 @@ CONTEXTE DU POSTE :
 - DESCRIPTION : ${jobOffer?.description || 'Description non disponible'}
 - COMPÉTENCES REQUISES : ${jobOffer?.skills?.join(', ') || 'Compétences non spécifiées'}
 
-RÈGLES STRICTES POUR CONVERSATION LIVE BIDIRECTIONNELLE :
+RÈGLES STRICTES :
+- Écoute attentivement le message vocal du candidat
+- Réponds de manière naturelle et conversationnelle
 - Pose des questions ouvertes pour encourager le dialogue
-- Suis les réponses du candidat avec des questions de clarification ou d'approfondissement
+- Suis les réponses du candidat avec des questions de clarification
 - Maintiens un ton neutre mais encourageant
-- Réponses COURTES et NATURELLES (max 2-3 phrases)
-- Questions PERSONNALISÉES selon le poste
+- Réponses COURTES (max 2-3 phrases)
+- Questions PERSONNALISÉES selon le poste et les compétences requises
 - 6-8 échanges maximum
 - Termine par : "L'entretien est terminé."
-- Utilise la synthèse vocale native du modèle gemini-live-2.5-flash-preview
-- Parle de manière naturelle et conversationnelle
 - Évite les questions génériques, adapte-les au contexte du poste
-- Optimise pour l'audio natif : phrases courtes, claires, rythmées
-- Réponds instantanément pour une conversation fluide
-- IMPORTANT : Ta réponse sera automatiquement lue en audio, optimise pour la synthèse vocale
+- Utilise les compétences requises pour personnaliser tes questions
 
 PROGRESSION DE L'ENTRETIEN :
 - Échanges 1-2 : Questions de présentation et motivation
@@ -604,7 +616,7 @@ NOMBRE D'ÉCHANGES : ${questionCount || 0}
 Historique :
 ${chatHistory.map(msg => `${msg.role === 'user' ? 'Candidat' : 'DRH'}: ${msg.content}`).join('\n')}
 
-Message vocal reçu. Réponds instantanément avec la synthèse vocale native du modèle gemini-live-2.5-flash-preview. Ta réponse sera automatiquement lue en audio.
+Le candidat vient de vous envoyer un message vocal. Écoutez-le attentivement et répondez de manière appropriée.
 
 ${(questionCount || 0) >= 6 ? 
   'TERMINE : "L\'entretien est terminé."' :
@@ -616,10 +628,9 @@ ${(questionCount || 0) >= 6 ?
 }
 `;
 
-      // Utiliser le modèle audio natif pour le mode live
-      const modelToUse = isLiveMode ? this.nativeAudioModel : this.model;
-      
-      const result = await modelToUse.generateContent([
+      // Utiliser le modèle standard pour traiter l'audio entrant
+      console.log('Envoi de l\'audio au modèle Gemini...');
+      const result = await this.model.generateContent([
         contextPrompt,
         {
           inlineData: {
@@ -631,6 +642,7 @@ ${(questionCount || 0) >= 6 ?
       
       const response = await result.response;
       const text = response.text().trim();
+      console.log('Réponse reçue du modèle Gemini:', text.substring(0, 100) + '...');
       
       const shouldEnd = text.includes("L'entretien est terminé") || (questionCount || 0) >= 8;
       
@@ -655,9 +667,23 @@ ${(questionCount || 0) >= 6 ?
         finalReport: shouldEnd ? await this.generateInterviewReport(chatHistory, jobOffer) : undefined
       };
     } catch (error) {
-      console.error('Erreur traitement audio Gemini Native Audio:', error);
+      console.error('Erreur traitement audio Gemini:', error);
+      
+      // Donner plus d'informations sur l'erreur
+      let errorMessage = 'Je n\'ai pas pu comprendre votre message vocal. Pouvez-vous répéter ou écrire votre réponse ?';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('API key')) {
+          errorMessage = 'Erreur de configuration API. Vérifiez votre clé Gemini.';
+        } else if (error.message.includes('audio')) {
+          errorMessage = 'Format audio non supporté. Essayez d\'enregistrer à nouveau.';
+        } else if (error.message.includes('network') || error.message.includes('timeout')) {
+          errorMessage = 'Erreur de connexion. Vérifiez votre internet et réessayez.';
+        }
+      }
+      
       return {
-        response: 'Je n\'ai pas pu comprendre votre message vocal. Pouvez-vous répéter ou écrire votre réponse ?',
+        response: errorMessage,
         shouldEnd: false
       };
     }
@@ -682,7 +708,7 @@ ${(questionCount || 0) >= 6 ?
     try {
       console.log('Conversion texte vers audio avec gemini-2.5-flash-preview-tts et voix Orus...');
       
-      const result = await this.nativeAudioModel.generateContent([
+      const result = await this.ttsModel.generateContent([
         {
           text: text,
           voice: "Orus"
