@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import Home from './components/sections/Home';
 import CVAnalysis from './components/sections/CVAnalysis';
 import JobMatching from './components/sections/JobMatching';
@@ -42,6 +43,7 @@ function App() {
         <main className="pt-16 sm:pt-20">
           {renderCurrentSection()}
         </main>
+        <Footer />
       </div>
     </Router>
   );

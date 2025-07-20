@@ -152,7 +152,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               
               {/* Nom de la plateforme avec les mêmes couleurs que le header */}
               <div className="mt-1 sm:mt-2">
-                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold group-hover:scale-105 transition-all duration-300">
+                <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold group-hover:scale-105 transition-all duration-300">
                   <span className="text-orange-500">C</span>
                   <span className="text-blue-600">v</span>
                   <span className="text-orange-500">Mentor</span>
