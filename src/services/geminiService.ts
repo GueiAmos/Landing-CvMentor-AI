@@ -176,8 +176,8 @@ IMPORTANT :
 
   async matchCVWithJob(cvText: string, jobOffer: JobOffer): Promise<CVJobMatch> {
     const prompt = `
-Tu es un DRH expérimenté dans le secteur concerné par l’offre d’emploi ci-dessous.
-Analyse le CV et l’offre d’emploi suivants :
+Tu es un DRH expérimenté dans le secteur concerné par l'offre d'emploi ci-dessous.
+Analyse le CV et l'offre d'emploi suivants :
 
 CV du candidat :
 ${cvText}
@@ -190,19 +190,19 @@ Compétences requises : ${jobOffer.skills.join(', ')}
 
 1. Extraction structurée de l'offre :
 - Intitulé du poste
-- Exigences (expérience, niveau d’étude, certifications, etc.)
+- Exigences (expérience, niveau d'étude, certifications, etc.)
 - Compétences attendues
 - Missions principales
 
 2. Matching raisonné façon DRH :
-- Liste des compétences du CV qui correspondent à l’offre (points forts, expliquer pourquoi)
+- Liste des compétences du CV qui correspondent à l'offre (points forts, expliquer pourquoi)
 - Liste des compétences manquantes ou à renforcer (expliquer leur importance pour le poste)
 - Score global de compatibilité RH (sur 100)
 
 3. Conseils personnalisés :
 - Conseils pour adapter ou enrichir le CV pour ce poste
 - Suggestions de formations/certifications reconnues pour combler les écarts
-- Conseils d’adaptation (mots-clés à ajouter, expériences à valoriser, etc.)
+- Conseils d'adaptation (mots-clés à ajouter, expériences à valoriser, etc.)
 
 Réponds uniquement avec un JSON structuré de la forme :
 {
@@ -217,7 +217,7 @@ Réponds uniquement avec un JSON structuré de la forme :
   "cvTips": "conseils pour enrichir ou reformuler le CV (texte)"
 }
 
-Sois critique, constructif, et adopte le point de vue d’un recruteur métier. Utilise un langage simple et accessible.`;
+Sois critique, constructif, et adopte le point de vue d'un recruteur métier. Utilise un langage simple et accessible.`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -426,7 +426,7 @@ IMPORTANT :
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.interviewModel.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
@@ -780,7 +780,7 @@ Sois direct et constructif dans tes évaluations.
 `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      const result = await this.interviewModel.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
