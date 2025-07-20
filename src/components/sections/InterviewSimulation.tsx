@@ -852,7 +852,7 @@ const InterviewSimulation: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">DRH IA - Entretien Live</h1>
           <p className="text-gray-700 mb-6">
             Échangez avec notre DRH IA par <strong>écrit</strong>, par <strong>note vocale</strong> ou en <strong>mode live</strong>. 
-            L'entretien est basé sur l'offre d'emploi que vous avez comparée à votre CV.
+            L'entretien est basé sur l\'offre d'emploi que vous avez comparée à votre CV.
           </p>
           
           {/* Options de mode */}
