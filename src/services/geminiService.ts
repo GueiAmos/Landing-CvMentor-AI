@@ -25,7 +25,7 @@ class GeminiService {
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     this.audioModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    this.liveModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash-live-preview' });
+    this.liveModel = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     
     // Instance séparée pour simulation d'entretien et lettres de motivation
     this.interviewGenAI = new GoogleGenerativeAI(liveApiKey);
@@ -34,7 +34,7 @@ class GeminiService {
     // Instance pour le mode live avec la clé spécialisée
     this.liveGenAI = new GoogleGenerativeAI(liveApiKey);
     this.liveModelWithVoice = this.liveGenAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash-live-preview',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.7,
         topK: 40,
@@ -44,7 +44,7 @@ class GeminiService {
     
     // Modèle pour traiter l'audio entrant (reconnaissance vocale)
     this.nativeAudioModel = this.liveGenAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash-live-preview',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.7,
         topK: 40,
@@ -54,7 +54,7 @@ class GeminiService {
     
     // Modèle TTS pour générer l'audio de réponse
     this.ttsModel = this.liveGenAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash-preview-tts',
+      model: 'gemini-2.5-flash',
       generationConfig: {
         temperature: 0.7,
         topK: 40,
