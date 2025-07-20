@@ -342,9 +342,7 @@ const CVAnalysisComponent: React.FC = () => {
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-xl flex items-center justify-center mr-4 sm:mr-6">
                         <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
                       </div>
-                      <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">✓</span>
-                      </div>
+                      {/* Icône verte supprimée */}
                     </div>
                     <div>
                       <h3 className="font-semibold text-blue-900 text-base sm:text-lg mb-1">{uploadedFile.name}</h3>

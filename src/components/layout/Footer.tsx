@@ -22,13 +22,12 @@ const Footer: React.FC = () => {
             <img 
               src={logo} 
               alt="CvMentor AI Logo" 
+              translate="no"
               className="w-12 h-12 sm:w-16 sm:h-16 mr-3 sm:mr-4"
             />
             <div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold">
-                <span className="text-orange-400">Cv</span>
-                <span className="text-blue-400">Mentor</span>
-                <span className="text-orange-400"> AI</span>
+                <span translate="no"><span className="text-orange-400">Cv</span><span className="text-blue-400">Mentor</span><span className="text-orange-400"> AI</span></span>
               </h3>
             </div>
           </div>
@@ -42,7 +41,7 @@ const Footer: React.FC = () => {
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 border border-white/10">
             <h4 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">À propos</h4>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              CvMentor AI utilise l'intelligence artificielle pour aider les candidats à améliorer leurs CV, 
+              <span translate="no">CvMentor AI</span> utilise l'intelligence artificielle pour aider les candidats à améliorer leurs CV, 
               simuler des entretiens d'embauche et développer leurs compétences professionnelles. 
               Notre mission est de démocratiser l'accès aux outils de préparation professionnelle 
               et d'accompagner chaque talent vers la réussite.
@@ -55,7 +54,7 @@ const Footer: React.FC = () => {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
             <div className="text-center">
               <p className="text-gray-300 text-sm sm:text-base">
-                © {currentYear} CvMentor AI. Tous droits réservés.
+                © {currentYear} <span translate="no">CvMentor AI</span>. Tous droits réservés.
               </p>
             </div>
           </div>

@@ -251,7 +251,7 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
   const [matchResult, setMatchResult] = useState<CVJobMatch | null>(null);
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"input" | "results">("input");
-  const [mobileTab, setMobileTab] = useState<"strengths" | "gaps">("strengths");
+  const [mobileTab, setMobileTab] = useState<'strengths' | 'gaps'>('strengths');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -266,6 +266,11 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
     setIsAnalyzing(false);
     setError("");
   }, []);
+
+  // Scroll en haut à chaque changement d'onglet principal (input/results)
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeTab]);
 
   const handleJobOfferChange = (field: keyof JobOffer, value: string) => {
     const updatedOffer = { ...jobOffer, [field]: value };
@@ -378,10 +383,29 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
 
       saveSession({ jobOffer: completeJobOffer });
 
+      // LOG des données extraites du CV
+      const extractedCV = session.cvAnalysis?.extractedSections;
+      console.log('Données extraites du CV pour la comparaison:', extractedCV);
+      if (!extractedCV || Object.values(extractedCV).every(val => !val || val.trim() === "")) {
+        setError("Votre CV n'a pas pu être analysé correctement. Veuillez vérifier que le fichier est lisible, bien structuré et contient des informations exploitables.");
+        setIsAnalyzing(false);
+        return;
+      }
+
       const match = await aiService.matchCVWithJob(
         session.cvText,
         completeJobOffer
       );
+
+      // Validation plus souple : on affiche les résultats si le score est bien un nombre
+      const isResultValid = match && typeof match.compatibilityRate === 'number';
+
+      if (!isResultValid) {
+        setError("Aucune correspondance réelle trouvée entre votre CV et l'offre. Veuillez vérifier que votre CV contient bien des informations exploitables et que l'offre est complète. Aucune donnée fictive ne sera affichée.");
+        setIsAnalyzing(false);
+        return;
+      }
+
       setMatchResult(match);
 
       // Créer un identifiant unique pour cette comparaison
@@ -453,6 +477,24 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
 
     onNavigate && onNavigate("skills");
   };
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-lg mx-auto">
+          <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-red-700 mb-2">Erreur</h2>
+          <p className="text-gray-700 mb-4">{error}</p>
+          <button
+            onClick={resetMatch}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold"
+          >
+            Revenir à la comparaison
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (matchResult) {
     return (
@@ -549,30 +591,105 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
 
                                   {/* Compétences Alignées et Lacunes */}
                 <div className="space-y-6">
-                  {/* Vue Mobile - Tabs pour Points Forts/Compétences */}
-                  <div className="lg:hidden">
+                  {/* Vue Mobile - Onglets Points Forts / Compétences Manquantes */}
+                  <div className="lg:hidden mb-6">
                     <div className="flex bg-white rounded-2xl p-1 shadow-lg mb-4">
                       <button
-                        onClick={() => setMobileTab("strengths")}
+                        onClick={() => setMobileTab('strengths')}
                         className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                          mobileTab === "strengths"
-                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
-                            : "text-gray-600 hover:text-green-600"
+                          mobileTab === 'strengths'
+                            ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                            : 'text-gray-600 hover:text-green-600'
                         }`}
                       >
-                        Points Forts
+                        Points forts
                       </button>
                       <button
-                        onClick={() => setMobileTab("gaps")}
+                        onClick={() => setMobileTab('gaps')}
                         className={`flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                          mobileTab === "gaps"
-                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg"
-                            : "text-gray-600 hover:text-orange-600"
+                          mobileTab === 'gaps'
+                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                            : 'text-gray-600 hover:text-orange-600'
                         }`}
                       >
-                        Compétences Manquantes
+                        Compétences à développer
                       </button>
                     </div>
+                    {/* Contenu de l'onglet sélectionné */}
+                    {mobileTab === 'strengths' && (
+                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
+                        <div className="flex items-center mb-4">
+                          <Award className="h-5 w-5 text-green-600 mr-2" />
+                          <h3 className="text-lg font-bold text-green-900">Vos points forts</h3>
+                        </div>
+                        <p className="text-green-800 text-xs mb-4">
+                          Compétences de votre CV qui correspondent aux attentes
+                        </p>
+                        <div className="space-y-2">
+                          {(() => {
+                            const aligned = matchResult.alignedSkills || [];
+                            if (aligned.length === 0) {
+                              return (
+                                <div className="text-center py-4">
+                                  <div className="text-orange-500 text-sm">
+                                    Aucun point fort identifié pour ce poste.
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return aligned.map((skill, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center bg-green-100 rounded-xl p-3"
+                              >
+                                <Star className="h-4 w-4 text-green-600 mr-2 flex-shrink-0" />
+                                <MarkdownRenderer
+                                  content={skill}
+                                  className="text-green-800 font-medium text-sm"
+                                />
+                              </div>
+                            ));
+                          })()}
+                        </div>
+                      </div>
+                    )}
+                    {mobileTab === 'gaps' && (
+                      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-200">
+                        <div className="flex items-center mb-4">
+                          <TrendingUp className="h-5 w-5 text-orange-600 mr-2" />
+                          <h3 className="text-lg font-bold text-orange-900">Compétences à développer</h3>
+                        </div>
+                        <p className="text-orange-800 text-xs mb-4">
+                          Compétences recherchées par l'employeur
+                        </p>
+                        <div className="space-y-2">
+                          {matchResult.gaps.map((gap, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center bg-orange-100 rounded-xl p-3"
+                            >
+                              <Target className="h-4 w-4 text-orange-600 mr-2 flex-shrink-0" />
+                              <MarkdownRenderer
+                                content={`**${gap}**`}
+                                className="text-orange-800 font-medium text-sm"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {/* Bouton formations dans la zone des compétences manquantes */}
+                        {matchResult.gaps.length > 0 && (
+                          <div className="mt-6">
+                            <button
+                              className="w-full group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-bold text-base transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
+                              onClick={handleGoToSkills}
+                            >
+                              Recommandations de formations
+                              <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Vue Web - Grille 3 colonnes */}
@@ -687,7 +804,8 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                   </div>
 
                   {/* Vue Mobile - Points Forts */}
-                  <div
+                  {/* This section is now redundant as the content is moved to the mobileTab */}
+                  {/* <div
                     className={`lg:hidden ${
                       mobileTab === "strengths" ? "block" : "hidden"
                     }`}
@@ -731,10 +849,11 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                         })()}
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Vue Mobile - Compétences Manquantes */}
-                  <div
+                  {/* This section is now redundant as the content is moved to the mobileTab */}
+                  {/* <div
                     className={`lg:hidden ${
                       mobileTab === "gaps" ? "block" : "hidden"
                     }`}
@@ -765,7 +884,7 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                       </div>
 
                       {/* Bouton formations dans la zone des compétences manquantes */}
-                      {matchResult.gaps.length > 0 && (
+                      {/* {matchResult.gaps.length > 0 && (
                         <div className="mt-6">
                           <button
                             className="w-full group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-bold text-base transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
@@ -775,9 +894,9 @@ const JobMatching: React.FC<JobMatchingProps> = ({ onNavigate }) => {
                             <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      )} */}
+                    {/* </div>
+                  </div> */}
                 </div>
               </div>
             </div>

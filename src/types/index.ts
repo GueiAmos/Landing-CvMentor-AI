@@ -9,6 +9,18 @@ export interface CVAnalysis {
   improvements: string[];
   missingKeywords: string[];
   formatRecommendations: string[];
+  extractedSections: {
+    identity: string;
+    contacts: string;
+    titleOrObjective: string;
+    experiences: string;
+    education: string;
+    skills: string;
+    languages: string;
+    certifications: string;
+    interests: string;
+    other: string;
+  };
 }
 
 export interface JobOffer {

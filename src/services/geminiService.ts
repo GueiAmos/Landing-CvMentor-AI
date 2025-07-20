@@ -54,7 +54,27 @@ class GeminiService {
 
   async analyzeCV(cvText: string): Promise<CVAnalysis> {
     const prompt = `
-Analysez ce CV en tant qu'expert RH spécialisé dans le marché de l'emploi africain. 
+Vous êtes un expert RH international, spécialiste de l'analyse de CV de tous formats (chronologique, thématique, tabulaire, créatif, atypique, désordonné, etc.).
+
+Votre mission :
+1. Extraire de façon structurée toutes les informations clés du CV, même si elles sont dispersées, mal nommées ou dans un ordre inhabituel. Identifiez :
+   - Identité (nom, prénom)
+   - Coordonnées (email, téléphone, LinkedIn...)
+   - Titre ou objectif professionnel
+   - Expériences professionnelles (poste, entreprise, dates, missions, réalisations)
+   - Formations (diplômes, établissements, dates)
+   - Compétences (techniques, comportementales, linguistiques)
+   - Certifications, langues, centres d'intérêt, projets, publications, etc.
+2. Détectez les faiblesses du CV, même si elles sont subtiles ou masquées par la forme (sections manquantes, informations floues, doublons, incohérences, informations inutiles ou obsolètes, manque de chiffres, etc.).
+3. Analysez la complétude et la cohérence du CV : quelles sections sont absentes ou sous-développées ? Y a-t-il des contradictions ou des éléments peu clairs ?
+4. Identifiez le format du CV (classique, créatif, étudiant, senior, etc.) et adaptez vos conseils d’optimisation à ce format.
+5. Proposez des optimisations concrètes et personnalisées pour améliorer l’impact, la lisibilité, la structure et la pertinence du CV, même s’il est très atypique.
+6. Si le CV est désorganisé ou non conventionnel, proposez une réorganisation logique et des titres de sections adaptés.
+
+RÈGLES D'ANALYSE :
+- Vous pouvez reconnaître des compétences, expériences ou formations équivalentes même si la formulation diffère (synonymes, formulations proches, expériences transférables).
+- Ne mentionnez jamais de compétence totalement absente du CV.
+- Soyez honnête et factuel : si une compétence n'est pas présente ni équivalente, n'en parlez pas comme acquise.
 
 CV à analyser :
 ${cvText}
@@ -70,7 +90,20 @@ Fournissez une analyse complète au format JSON avec cette structure exacte :
   "strengths": [array de 3-5 points forts concrets],
   "improvements": [array de 3-5 suggestions d'amélioration],
   "missingKeywords": [array de 5-8 mots-clés importants manquants],
-  "formatRecommendations": [array de 3-4 conseils de mise en forme]
+  "formatRecommendations": [array de 3-4 conseils de mise en forme],
+  "extractedSections": {
+    "identity": string,
+    "contacts": string,
+    "titleOrObjective": string,
+    "experiences": string,
+    "education": string,
+    "skills": string,
+    "languages": string,
+    "certifications": string,
+    "interests": string,
+    "other": string
+  },
+  "detectedFormat": "string (ex: chronologique, créatif, étudiant, senior, désordonné, etc.)"
 }
 
 Critères d'évaluation :
@@ -78,12 +111,14 @@ Critères d'évaluation :
 - Impact : Pertinence des expériences, quantification des résultats, valeur ajoutée
 - Structure : Hiérarchie visuelle, sections logiques, progression chronologique
 
-IMPORTANT : 
+IMPORTANT :
+- Soyez rigoureux dans l'extraction, même si le CV est mal structuré ou atypique
 - Utilisez un vocabulaire simple et accessible, évitez les termes techniques complexes
 - Rédigez dans un langage facilement compréhensible dès la première lecture
 - Mettez les mots importants entre **double astérisques** pour les mettre en gras
 - Soyez constructif et donnez des conseils pratiques et concrets
-- Adaptez vos conseils au contexte professionnel africain
+- Adaptez vos conseils au contexte professionnel africain et au format détecté
+- Si une information est absente, indiquez-le explicitement dans la section correspondante
 `;
 
     try {
@@ -106,7 +141,22 @@ IMPORTANT :
 
   async analyzePDFCV(pdfBase64: string): Promise<CVAnalysis> {
     const prompt = `
-Analysez ce CV en tant qu'expert RH spécialisé dans le marché de l'emploi africain. 
+Vous êtes un expert RH international, spécialiste de l'analyse de CV PDF de tous formats (chronologique, thématique, tabulaire, créatif, scanné, atypique, désordonné, etc.).
+
+Votre mission :
+1. Extraire de façon structurée toutes les informations clés du CV, même si elles sont dispersées, mal nommées, dans un ordre inhabituel ou peu lisibles (PDF scanné, photo, etc.). Identifiez :
+   - Identité (nom, prénom)
+   - Coordonnées (email, téléphone, LinkedIn...)
+   - Titre ou objectif professionnel
+   - Expériences professionnelles (poste, entreprise, dates, missions, réalisations)
+   - Formations (diplômes, établissements, dates)
+   - Compétences (techniques, comportementales, linguistiques)
+   - Certifications, langues, centres d'intérêt, projets, publications, etc.
+2. Détectez les faiblesses du CV, même si elles sont subtiles ou masquées par la forme (sections manquantes, informations floues, doublons, incohérences, informations inutiles ou obsolètes, manque de chiffres, etc.).
+3. Analysez la complétude et la cohérence du CV : quelles sections sont absentes ou sous-développées ? Y a-t-il des contradictions ou des éléments peu clairs ?
+4. Identifiez le format du CV (classique, créatif, étudiant, senior, scanné, etc.) et adaptez vos conseils d’optimisation à ce format.
+5. Proposez des optimisations concrètes et personnalisées pour améliorer l’impact, la lisibilité, la structure et la pertinence du CV, même s’il est très atypique ou mal scanné.
+6. Si le CV est désorganisé ou non conventionnel, proposez une réorganisation logique et des titres de sections adaptés.
 
 Le CV est fourni sous forme de document PDF. Analysez son contenu complet.
 
@@ -121,7 +171,20 @@ Fournissez une analyse complète au format JSON avec cette structure exacte :
   "strengths": [array de 3-5 points forts concrets],
   "improvements": [array de 3-5 suggestions d'amélioration],
   "missingKeywords": [array de 5-8 mots-clés importants manquants],
-  "formatRecommendations": [array de 3-4 conseils de mise en forme]
+  "formatRecommendations": [array de 3-4 conseils de mise en forme],
+  "extractedSections": {
+    "identity": string,
+    "contacts": string,
+    "titleOrObjective": string,
+    "experiences": string,
+    "education": string,
+    "skills": string,
+    "languages": string,
+    "certifications": string,
+    "interests": string,
+    "other": string
+  },
+  "detectedFormat": "string (ex: chronologique, créatif, étudiant, senior, scanné, désordonné, etc.)"
 }
 
 Critères d'évaluation :
@@ -129,12 +192,14 @@ Critères d'évaluation :
 - Impact : Pertinence des expériences, quantification des résultats, valeur ajoutée
 - Structure : Hiérarchie visuelle, sections logiques, progression chronologique
 
-IMPORTANT : 
+IMPORTANT :
+- Soyez rigoureux dans l'extraction, même si le CV est mal structuré, scanné ou atypique
 - Utilisez un vocabulaire simple et accessible, évitez les termes techniques complexes
 - Rédigez dans un langage facilement compréhensible dès la première lecture
 - Mettez les mots importants entre **double astérisques** pour les mettre en gras
 - Soyez constructif et donnez des conseils pratiques et concrets
-- Adaptez vos conseils au contexte professionnel africain
+- Adaptez vos conseils au contexte professionnel africain et au format détecté
+- Si une information est absente, indiquez-le explicitement dans la section correspondante
 `;
 
     try {
@@ -165,8 +230,9 @@ IMPORTANT :
 
   async matchCVWithJob(cvText: string, jobOffer: JobOffer): Promise<CVJobMatch> {
     const prompt = `
-Tu es un DRH expérimenté dans le secteur concerné par l'offre d'emploi ci-dessous.
-Analyse le CV et l'offre d'emploi suivants :
+Tu es un DRH expérimenté du secteur concerné par l'offre ci-dessous, avec une excellente connaissance du marché africain.
+
+Analyse le CV et l'offre d'emploi suivants (sois flexible sur la formulation, mais factuel) :
 
 CV du candidat :
 ${cvText}
@@ -177,27 +243,19 @@ Entreprise : ${jobOffer.company}
 Description : ${jobOffer.description}
 Compétences requises : ${jobOffer.skills.join(', ')}
 
-1. Extraction structurée de l'offre :
-- Intitulé du poste
-- Exigences (expérience, niveau d'étude, certifications, etc.)
-- Compétences attendues
-- Missions principales
-
-2. Matching raisonné façon DRH :
-- Liste des compétences du CV qui correspondent à l'offre (points forts, expliquer pourquoi)
-- Liste des compétences manquantes ou à renforcer (expliquer leur importance pour le poste)
-- Score global de compatibilité RH (sur 100)
-
-3. Conseils personnalisés :
-- Conseils pour adapter ou enrichir le CV pour ce poste
-- Suggestions de formations/certifications reconnues pour combler les écarts
-- Conseils d'adaptation (mots-clés à ajouter, expériences à valoriser, etc.)
+RÈGLES :
+- Identifie les correspondances même si la formulation diffère (synonymes, expériences équivalentes, compétences transférables…).
+- Pour chaque point fort, explique pourquoi la compétence ou l'expérience du CV correspond à l'attente de l'offre (même si ce n'est pas le même mot).
+- Pour chaque compétence manquante, explique pourquoi elle est importante et si le candidat a des expériences proches ou transférables.
+- Ne mentionne jamais de compétence totalement absente du CV.
+- Sois honnête : si une compétence n'est pas présente ni équivalente, indique-la comme manquante.
+- Donne un score de compatibilité RH (sur 100) et justifie-le.
 
 Réponds uniquement avec un JSON structuré de la forme :
 {
   "compatibilityRate": number (pourcentage entre 0 et 100),
-  "alignedSkills": [array des compétences du candidat qui correspondent],
-  "gaps": [array des compétences manquantes spécifiquement pour ce poste],
+  "alignedSkills": [array des compétences du candidat qui correspondent, avec justification],
+  "gaps": [array des compétences manquantes ou à renforcer, avec explication],
   "adaptationTips": [array de conseils pour améliorer la candidature],
   "cvSkills": [array des compétences extraites du CV],
   "offerSkills": [array des compétences extraites de l'offre],
@@ -206,7 +264,8 @@ Réponds uniquement avec un JSON structuré de la forme :
   "cvTips": "conseils pour enrichir ou reformuler le CV (texte)"
 }
 
-Sois critique, constructif, et adopte le point de vue d'un recruteur métier. Utilise un langage simple et accessible.`;
+Sois critique, constructif, et adopte le point de vue d'un recruteur métier. Utilise un langage simple et accessible.
+`;
 
     try {
       const result = await this.model.generateContent(prompt);
@@ -219,7 +278,7 @@ Sois critique, constructif, et adopte le point de vue d'un recruteur métier. Ut
       throw new Error('Format de réponse invalide');
     } catch (error) {
       console.error('Erreur matching Gemini:', error);
-      throw new Error('Erreur lors de l\'analyse de compatibilité');
+      throw new Error("Erreur lors de l'analyse de compatibilité");
     }
   }
 
@@ -303,6 +362,7 @@ Répartition souhaitée :
 - 3 questions comportementales (situations, défis, travail en équipe, adaptées au secteur)
 - 2 questions techniques (compétences, méthodes de travail, adaptées à l'offre)
 
+
 IMPORTANT :
 - Utilise un vocabulaire simple et accessible
 - Formule des questions claires, réalistes et contextualisées
@@ -379,10 +439,23 @@ IMPORTANT :
 
   async generateSkillDevelopmentPlan(gaps: string[]): Promise<SkillGap[]> {
     const prompt = `
-Créez un plan de développement des compétences pour ces lacunes identifiées :
+Pour chaque compétence manquante ci-dessous, proposez un plan de développement réellement pertinent et accessible pour un utilisateur africain.
+
+Compétences à combler :
 ${gaps.join(', ')}
 
-Fournissez un plan au format JSON avec des ressources variées :
+Règles strictes :
+- Proposez uniquement des ressources réelles, vérifiées et accessibles (cours, vidéos, certifications, articles, communautés, etc.).
+- Proposez des ressources variées : vidéos YouTube, cours en ligne (Coursera, Udemy, OpenClassrooms), articles de blog, e-books, sites web spécialisés, communautés LinkedIn, certifications
+- Donnez l'URL exacte de la ressource (pas de liens fictifs ou génériques).
+- Incluez des ressources gratuites et payantes
+- Si aucune ressource fiable n'existe pour une compétence, indiquez-le explicitement et n'inventez rien.
+- Privilégiez les ressources en français et/ou accessibles depuis l'Afrique.
+- Pour chaque compétence, recommandez la formation ou la ressource la plus adaptée et accessible, en expliquant pourquoi elle est pertinente.
+- Précisez le type de ressource (cours, vidéo, certification, etc.), la plateforme, la difficulté, et une courte description.
+- Donnez des conseils pratiques pour tirer le meilleur parti de chaque ressource.
+
+Répondez uniquement avec un JSON structuré ainsi :
 {
   "skillGaps": [
     {
@@ -393,25 +466,22 @@ Fournissez un plan au format JSON avec des ressources variées :
         {
           "title": "string",
           "type": "video|course|article|certification|ebook|blog|website|community",
-          "url": "string (URL réelle si possible)",
+          "url": "string (URL réelle uniquement)",
           "difficulty": "beginner|intermediate|advanced",
           "duration": "string",
           "description": "string (description courte de la ressource)"
         }
-      ]
+      ],
+      "bestRecommendation": "string (titre de la ressource la plus adaptée, ou 'Aucune ressource fiable trouvée' si c'est le cas)",
+      "advice": "string (conseil pratique pour progresser sur cette compétence)"
     }
   ]
 }
 
 IMPORTANT :
-- Proposez des ressources variées : vidéos YouTube, cours en ligne (Coursera, Udemy, OpenClassrooms), articles de blog, e-books, sites web spécialisés, communautés LinkedIn, certifications
-- Incluez des ressources gratuites et payantes
-- Mentionnez des plateformes connues : Coursera, Udemy, LinkedIn Learning, OpenClassrooms, YouTube, blogs spécialisés
-- Ajoutez des ressources en français quand possible
-- Donnez des URLs réelles quand c'est possible
-- Utilisez un vocabulaire simple et accessible
-- Donnez des conseils pratiques et réalisables
-- Estimez le temps de développement de manière réaliste
+- Ne fournissez jamais de ressource fictive ou inventée.
+- Si aucune ressource fiable n'est trouvée, indiquez-le clairement dans le champ 'bestRecommendation' et ne remplissez pas le tableau 'resources'.
+- Soyez synthétique, précis, et utile.
 `;
 
     try {

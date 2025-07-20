@@ -32,16 +32,14 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
                 <img 
                   src={logo} 
                   alt="CvMentor AI Logo" 
+                  translate="no"
                   className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
                 />
               </div>
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold hidden sm:block">
-                <span className="text-orange-500">C</span>
-                <span className="text-blue-600">v</span>
-                <span className="text-orange-500">Mentor</span>
-                <span className="text-blue-600"> AI</span>
+                <span translate="no"><span className="text-orange-500">C</span><span className="text-blue-600">v</span><span className="text-orange-500">Mentor</span><span className="text-blue-600"> AI</span></span>
               </h1>
               <p className="text-sm text-gray-500 hidden sm:block  duration-300">
                 Optimisez votre candidature
@@ -140,7 +138,7 @@ const Header: React.FC<HeaderProps> = ({ currentSection, onNavigate }) => {
                 <div className="mt-6 pt-6 border-t border-gray-200/50">
                   <div className="text-center">
                     <p className="text-xs text-gray-500">
-                      CvMentor AI - Optimisez votre candidature
+                      <span translate="no">CvMentor AI</span> - Optimisez votre candidature
                     </p>
                   </div>
                 </div>

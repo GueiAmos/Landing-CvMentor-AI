@@ -145,6 +145,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                   <img 
                     src={logo} 
                     alt="CvMentor AI Logo" 
+                    translate="no"
                     className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 object-contain drop-shadow-lg"
                   />
                 </div>
@@ -153,10 +154,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               {/* Nom de la plateforme avec les mêmes couleurs que le header */}
               <div className="mt-1 sm:mt-2">
                 <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold group-hover:scale-105 transition-all duration-300">
-                  <span className="text-orange-500">C</span>
-                  <span className="text-blue-600">v</span>
-                  <span className="text-orange-500">Mentor</span>
-                  <span className="text-blue-600"> AI</span>
+                  <span translate="no"><span className="text-orange-500">C</span><span className="text-blue-600">v</span><span className="text-orange-500">Mentor</span><span className="text-blue-600"> AI</span></span>
                 </h1>
               </div>
             </div>
@@ -276,7 +274,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="text-center mb-6 sm:mb-8 lg:mb-10">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
               Pourquoi choisir{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-orange-400" translate="no">
                 CvMentor AI
               </span>{" "}
               ?
