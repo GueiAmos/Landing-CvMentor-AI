@@ -41,7 +41,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     },
     {
       icon: <Target className="h-8 w-8" />,
-      title: "Comparaison CV-Offre",
+      title: "Matching CV-Offre",
       description:
         "Comparez votre CV avec des offres d'emploi et découvrez votre taux de compatibilité en temps réel.",
       color: "from-orange-400 to-orange-500",
@@ -135,9 +135,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
 
   // Statistiques
   const stats = [
-    { number: "50+", label: "Utilisateurs actifs" },
+    { number: "50+", label: "Utilisateurs" },
     { number: "100+", label: "CV analysés" },
-    { number: "75%", label: "Taux de satisfaction" },
+    { number: "5+", label: "Outils IA" },
     { number: "5+", label: "Partenaires" },
   ];
 
@@ -178,7 +178,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Hero Section */}
       <section
         id="hero"
-        className="relative overflow-hidden pt-16 bg-gradient-to-br from-white via-blue-80/30 to-indigo-70/30"
+        className="relative overflow-hidden pt-20 bg-gradient-to-br from-white via-blue-100/60 to-blue-200/40"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -228,7 +228,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
 
             {/* Titre accrocheur avec design moderne */}
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              L'IA qui révolutionne votre recherche d'emploi en Afrique
+              L'outil qui révolutionne votre recherche d'emploi en Afrique
               {/* Passez de candidature ignorée à profil recherché */}
             </h2>
 
@@ -250,38 +250,39 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Statistiques rapides inspirées d'AIApply */}
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 max-w-3xl mx-auto">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="text-center bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20"
-                >
-                  <div className="text-lg md:text-xl font-bold text-gray-900 mb-1">
-                    {stat.number}
-                  </div>
-                  <div className="text-xs text-gray-600 font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Video d'illustration/presentation */}
-            <div className="flex justify-center mt-8">
-              <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-white/90">
-                <div className="relative pb-[56.25%] h-0">
-                  <iframe
-                    className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                    src="https://www.youtube.com/embed/SEIDyEpFoas?si=H7-Vafh3j09ZI2fx"
-                    title="Présentation CvMentor AI"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+      {/* Section stats + video illustration responsive */}
+      <section className="w-full py-6 lg:py-10 flex flex-col md:flex-row gap-10 items-center justify-center px-2 sm:px-4 lg:px-14 bg-gradient-to-br from-blue-50 via-white to-orange-50/40">
+        {/* Bloc stats */}
+        <div className="w-full md:w-3/6 flex justify-center grid grid-cols-2 gap-4 md:grid-cols-4 max-w-3xl mx-auto">
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="text-center bg-white/80 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-white/20"
+            >
+              <div className="text-md md:text-xl font-bold text-gray-900 mb-1">
+                {stat.number}
               </div>
+              <div className="text-2xs text-gray-600 font-medium">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Bloc vidéo */}
+        <div className="w-full md:w-3/6 flex justify-center">
+          <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-white/90">
+            <div className="relative pb-[56.25%] h-0">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full rounded-2xl"
+                src="https://www.youtube.com/embed/SEIDyEpFoas?si=H7-Vafh3j09ZI2fx"
+                title="Présentation CvMentor AI"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>
@@ -290,7 +291,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Section Fonctionnalités */}
       <section
         id="features"
-        className="py-8 lg:py-8 bg-gradient-to-br from-slate-50 to-white"
+        className="py-8 lg:py-12 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
@@ -358,7 +359,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Proposition de Valeur */}
       <section
         id="value"
-        className="bg-gradient-to-br from-slate-700 via-blue-800 to-indigo-800 py-8 sm:py-8 lg:py-8 relative overflow-hidden"
+        className="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-800 py-8 sm:py-8 lg:py-12 relative overflow-hidden"
       >
         <div className="absolute inset-0 opacity-10">
           <div
@@ -418,12 +419,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
             ))}
           </div>
         </div>
+        {/* Decorative SVGs */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <svg
+            className="absolute left-0 top-0 w-40 h-40 opacity-10"
+            viewBox="0 0 200 200"
+            fill="none"
+          >
+            <circle cx="100" cy="100" r="100" fill="#fff" />
+          </svg>
+          <svg
+            className="absolute right-0 top-10 w-32 h-32 opacity-10"
+            viewBox="0 0 160 160"
+            fill="none"
+          >
+            <circle cx="80" cy="80" r="80" fill="#fff" />
+          </svg>
+        </div>
       </section>
 
       {/* À propos de nous */}
       <section
         id="about"
-        className="py-12 lg:py-20 bg-gradient-to-br from-white via-blue-50 to-indigo-50 border-t border-b border-blue-100"
+        className="py-8 lg:py-12 bg-gradient-to-br from-blue-50 via-white to-orange-50 border-t border-b border-blue-100"
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
@@ -478,7 +496,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* FAQ */}
       <section
         id="faq"
-        className="py-8 lg:py-12 bg-gradient-to-br from-slate-100 to-gray-50"
+        className="py-8 lg:py-12 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
@@ -537,7 +555,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Call-to-Action - Design Minimaliste */}
       <section
         id="cta"
-        className="bg-gradient-to-br from-indigo-50 via-blue-100/50 to-indigo-50 py-10 lg:py-14"
+        className="bg-gradient-to-br from-blue-50 via-orange-50 to-white py-10 lg:py-12 border-b border-blue-100"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Titre simple et impactant */}
