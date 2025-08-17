@@ -387,10 +387,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                           <span className="text-sm font-semibold text-gray-900" translate="no">
                             {f.title}
                           </span>
-                          <span className="text-[10px] text-gray-500">90%</span>
                         </div>
-                        <div className="mt-1 h-1.5 bg-gray-100 rounded">
-                          <div className="h-1.5 rounded bg-[#15679d]" style={{ width: "90%" }}></div>
+                        <div className="mt-1 h-1.5 bg-gray-200 rounded">
+                          <div className="h-1.5 rounded bg-[#15679d]" style={{ width: "75%" }}></div>
                         </div>
                       </div>
                     </div>
