@@ -75,6 +75,7 @@ const Footer: React.FC = () => {
               <a
                 href="#features"
                 className="inline-flex items-center justify-center w-full md:w-auto gap-2 bg-white text-[#15679d] px-4 py-2 rounded-md font-bold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                translate="no"
               >
                 Commencer
                 <ArrowRight className="h-4 w-4" />

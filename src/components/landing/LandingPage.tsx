@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FileText,
   FileCheck,
@@ -29,6 +29,9 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [pauseRotation, setPauseRotation] = useState(false);
+  const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
 
   // Fonctionnalités principales
   const features = [
@@ -49,22 +52,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       bgColor: "orange-700",
     },
     {
-      icon: <MessageCircle className="h-8 w-8" />,
-      title: "Simulation d'entretien",
-      description:
-        "Entraînez-vous avec notre DRH IA pour être prêt pour vos entretiens d'embauche.",
-      color: "from-blue-600 to-blue-700",
-      bgColor: "blue-700",
-    },
-    {
-      icon: <BookOpen className="h-8 w-8" />,
-      title: "Plan de formation",
-      description:
-        "Recevez des recommandations personnalisées de ressources de formation pour améliorer vos compétences nécessaires.",
-      color: "from-orange-400 to-orange-500",
-      bgColor: "orange-700",
-    },
-    {
       icon: <FileText className="h-8 w-8" />,
       title: "Lettre de motivation",
       description:
@@ -72,6 +59,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       color: "from-blue-600 to-blue-700",
       bgColor: "blue-700",
     },
+    {
+      icon: <MessageCircle className="h-8 w-8" />,
+      title: "Simulation d'entretien",
+      description:
+        "Entraînez-vous avec notre DRH IA pour être prêt pour vos entretiens d'embauche.",
+      color: "from-orange-400 to-orange-500",
+      bgColor: "orange-700",
+    },
+    {
+      icon: <BookOpen className="h-8 w-8" />,
+      title: "Plan de formation",
+      description:
+        "Recevez des recommandations personnalisées de ressources de formation pour améliorer vos compétences nécessaires.",
+      color: "from-blue-600 to-blue-700",
+      bgColor: "blue-700",
+    },
+
     {
       icon: <Briefcase className="h-8 w-8" />,
       title: "Plateformes d'offres d'emploi",
@@ -97,6 +101,59 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     //   bgColor: "orange-700",
     // },
   ];
+
+  // Sync active feature with mobile horizontal scroll position
+  const handleMobileScroll = () => {
+    const el = mobileCarouselRef.current;
+    if (!el) return;
+    const first = el.firstElementChild as HTMLElement | null;
+    if (!first) return;
+    // gap-4 = 16px
+    const slideW = first.getBoundingClientRect().width + 16;
+    const idx = Math.round(el.scrollLeft / slideW);
+    const clamped = Math.max(0, Math.min(idx, features.length - 1));
+    if (clamped !== activeFeature) setActiveFeature(clamped);
+  };
+
+  // Auto-scroll mobile carousel every 3s
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(max-width: 767px)").matches
+    ) {
+      const el = mobileCarouselRef.current;
+      if (!el) return;
+      const interval = setInterval(() => {
+        const first = el.firstElementChild as HTMLElement | null;
+        if (!first) return;
+        const slideW = first.getBoundingClientRect().width + 16; // gap-4
+        setActiveFeature((prev) => {
+          const next = (prev + 1) % features.length;
+          el.scrollTo({ left: next * slideW, behavior: "smooth" });
+          return next;
+        });
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [features.length]);
+  // (features moved above to avoid use-before-declaration)
+
+  // Auto-rotation des fonctionnalités (toutes les 4s) – désactivée sur mobile
+  useEffect(() => {
+    // Désactiver l'auto-rotation sur mobile (md breakpoint Tailwind ~ 768px)
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(max-width: 767px)").matches
+    ) {
+      return;
+    }
+    const id = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % features.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [features.length]);
 
   // Bénéfices
   const benefits = [
@@ -289,7 +346,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
         </div>
       </section>
 
-      {/* Section Fonctionnalités */}
+      {/* Section Fonctionnalités - Liste gauche + aperçu droite */}
       <section
         id="features"
         className="py-20 lg:py-20 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
@@ -305,54 +362,162 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
             </p>
           </div>
 
-          {/* Fonctionnalités principales */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`group relative bg-white/80 backdrop-blur-sm rounded-2xl p-5 shadow-md hover:shadow-2xl transition-all duration-500 border border-${feature.bgColor} hover:border-white/80 overflow-hidden transform hover:-translate-y-2`}
-              >
-                {/* Background gradient overlay */}
+          {/* Vue mobile: carrousel horizontal avec snap */}
+          <div className="md:hidden">
+            <div
+              ref={mobileCarouselRef}
+              onScroll={handleMobileScroll}
+              className="flex gap-4 overflow-x-auto px-2 snap-x snap-mandatory scroll-smooth"
+            >
+              {features.map((f, idx) => (
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${feature.color
-                    .replace("from-", "from-")
-                    .replace(
-                      "to-",
-                      "to-"
-                    )} opacity-5 group-hover:opacity-100 transition-opacity duration-600`}
-                ></div>
+                  key={idx}
+                  className="shrink-0 snap-center w-[88%] mx-1"
+                >
+                  {/* En-tête de la fonctionnalité avec progression */}
+                  <div className="bg-white/90 rounded-xl p-3 shadow-md border border-gray-100 mb-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-lg bg-gradient-to-r ${f.color} flex items-center justify-center text-white shadow`}
+                      >
+                        {f.icon}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-gray-900" translate="no">
+                            {f.title}
+                          </span>
+                          <span className="text-[10px] text-gray-500">90%</span>
+                        </div>
+                        <div className="mt-1 h-1.5 bg-gray-100 rounded">
+                          <div className="h-1.5 rounded bg-[#15679d]" style={{ width: "90%" }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Icon container with modern design */}
-                <div className="relative z-10 mb-4">
-                  <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-white shadow-md group-hover:shadow-xl group-hover:scale-105 transition-all duration-600 ring-4 ring-white/20 group-hover:ring-white/40`}
-                  >
-                    {feature.icon}
+                  {/* Carte d'aperçu */}
+                  <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-2xl p-5 shadow-xl border border-blue-100">
+                    <div className="absolute inset-0 opacity-30 pointer-events-none" aria-hidden="true">
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(circle at 20% 80%, rgba(21,103,157,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(241,112,28,0.12) 0%, transparent 50%)',
+                        }}
+                      />
+                    </div>
+                    <div className="relative z-10">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{f.description}</p>
+                      <div className="w-full aspect-[3/4] rounded-lg bg-white/90 border border-gray-200 shadow flex items-center justify-center">
+                        <span className="text-xs text-gray-500">Aperçu {f.title}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+            {/* Indicateurs (dots) */}
+            <div className="flex justify-center gap-1 mt-4">
+              {features.map((_, i) => (
+                <span
+                  key={i}
+                  className={[
+                    "h-2 w-2 rounded-full transition-colors",
+                    i === activeFeature ? "bg-[#15679d]" : "bg-gray-300",
+                  ].join(" ")}
+                />
+              ))}
+            </div>
+          </div>
 
-                {/* Content */}
-                <div className="relative z-10">
-                  <h3
-                    className={`${feature.bgColor.includes('blue') ? 'text-[#15679d]' : feature.bgColor.includes('orange') ? 'text-[#f1701c]' : ''} text-md font-bold mb-2 group-hover:text-white transition-colors`}
-                    translate="no"
-                  >
-                    {feature.title}
-                  </h3>
-                  <h4
-                    className={`${feature.bgColor.includes('blue') ? 'text-[#15679d]' : feature.bgColor.includes('orange') ? 'text-[#f1701c]' : ''} text-sm group-hover:text-white transition-colors`}
-                    translate="no"
-                  >
-                    {feature.description}
-                  </h4>
+          {/* Vue desktop: liste + aperçu */}
+          <div
+            className="hidden md:grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch"
+            onMouseEnter={() => setPauseRotation(true)}
+            onMouseLeave={() => setPauseRotation(false)}
+          >
+            {/* Liste des fonctionnalités */}
+            <div className="md:col-span-2">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-gray-100 h-full">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] tracking-widest text-gray-500 font-semibold">
+                    PROGRÈS
+                  </span>
+                </div>
+                <ul className="space-y-2">
+                  {features.map((f, idx) => {
+                    const active = idx === activeFeature;
+                    return (
+                      <li key={idx}>
+                        <button
+                          aria-current={active}
+                          onClick={() => setActiveFeature(idx)}
+                          className={[
+                            "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                            active
+                              ? "bg-blue-50 ring-1 ring-[#15679d]/30"
+                              : "hover:bg-gray-50",
+                          ].join(" ")}
+                        >
+                          <span className="flex-shrink-0">
+                            <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${f.color} flex items-center justify-center text-white shadow`}>{f.icon}</div>
+                          </span>
+                          <div className="flex-1">
+                            <div className="flex items-center mb-2">
+                              <span className="text-sm font-semibold text-gray-900" translate="no">{f.title}</span>
+                            </div>
+                            <div className="mt-1 h-1 bg-gray-200 rounded">
+                              <div className={`h-1 rounded ${active ? 'bg-[#15679d]' : 'bg-gray-200'}`} style={{ width: active ? '75%' : '0%' }}></div>
+                            </div>
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            {/* Aperçu de la fonctionnalité active */}
+            <div className="md:col-span-3">
+              <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-orange-50 rounded-2xl p-6 md:p-8 shadow-xl border border-blue-100 h-full">
+                <div className="absolute inset-0 opacity-40 pointer-events-none" aria-hidden="true">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage:
+                        'radial-gradient(circle at 20% 80%, rgba(21,103,157,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(241,112,28,0.12) 0%, transparent 50%)',
+                    }}
+                  />
                 </div>
 
-                {/* Hover effect indicator */}
-                <div
-                  className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}
-                ></div>
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                  <div className="lg:col-span-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#15679d]/10 text-[#15679d] text-xs font-semibold mb-3" translate="no">
+                      {features[activeFeature].title}
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                      {features[activeFeature].title}
+                    </h3>
+                    <p className="text-gray-600 md:text-lg mb-5">
+                      {features[activeFeature].description}
+                    </p>
+                    <button className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-[#15679d] text-white font-semibold text-sm hover:bg-[#135986] transition-colors">
+                      Découvrir
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {/* Mock preview card */}
+                  <div className="lg:col-span-1">
+                    <div className="w-full aspect-[3/4] rounded-xl bg-white/90 border border-gray-200 shadow-lg flex items-center justify-center">
+                      <span className="text-sm text-gray-500">Aperçu {features[activeFeature].title}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -470,7 +635,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
               <img
                 src={teamImg}
                 alt="L'équipe CvMentor AI"
-                className="w-full max-w-lg md:max-w-xl rounded-2xl shadow-lg border border-blue-100"
+                className="w-full max-w-lg md:max-w-xl rounded-xl shadow-lg border border-blue-100"
               />
             </div>
           </div>
@@ -519,11 +684,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                   </span>
                 </button>
                 <div
-                  className={`transition-all duration-300 ease-in-out ${
-                    openFaq === index
+                  className={`transition-all duration-300 ease-in-out ${openFaq === index
                       ? "max-h-40 opacity-100 py-2 px-7"
                       : "max-h-0 opacity-0 py-0 px-7"
-                  } overflow-hidden bg-white/90`}
+                    } overflow-hidden bg-white/90`}
                   style={{}}
                 >
                   <p className="text-gray-600 text-sm leading-relaxed">
@@ -536,7 +700,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
         </div>
       </section>
 
-      
+
 
       {/* Pied de page */}
       <Footer />
