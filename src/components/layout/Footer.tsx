@@ -1,28 +1,28 @@
 import React from "react";
 import logo from "../../assets/logo.png";
-import { MessageSquare, Phone } from "lucide-react";
+import { ArrowRight, MessageSquare, Phone, Mail, MapPin, Linkedin } from "lucide-react";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gradient-to-br from-slate-800 via-blue-900 to-indigo-900 text-white relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-slate-900 via-[#12456e] to-[#15679d] text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-                              radial-gradient(circle at 75% 75%, rgba(249, 115, 22, 0.3) 0%, transparent 50%)`,
+            backgroundImage: `radial-gradient(circle at 20% 30%, rgba(21, 103, 157, 0.35) 0%, transparent 45%),
+                              radial-gradient(circle at 80% 70%, rgba(241, 112, 28, 0.22) 0%, transparent 50%)`,
           }}
         ></div>
       </div>
 
       <div className="relative z-10">
         {/* Main Footer Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
           {/* Top Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
             {/* Logo, Brand, Mission */}
-            <div>
+            <div className="mr-0">
               <div className="flex items-center mb-3">
                 <img
                   src={logo}
@@ -30,106 +30,68 @@ const Footer: React.FC = () => {
                   className="w-8 h-8 mr-2"
                 />
                 <h3 className="text-lg font-bold" translate="no">
-                  <span className="text-orange-400">C</span>
-                  <span className="text-blue-400">v</span>
-                  <span className="text-orange-400">Mentor</span>
-                  <span className="text-blue-400"> AI</span>
+                  <span className="text-[#f1701c]">C</span>
+                  <span className="text-[#15679d]">v</span>
+                  <span className="text-[#f1701c]">Mentor</span>
+                  <span className="text-[#15679d]"> AI</span>
                 </h3>
               </div>
-              <p className="text-gray-300 text-xs leading-relaxed mb-3">
+              <p className="text-gray-300 text-xs leading-relaxed mb-0">
                 Plateforme d'intelligence artificielle dédiée aux jeunes talents
                 africains pour optimiser leurs candidatures et réussir leurs
                 entretiens d'embauche.
               </p>
-
-              {/* Contact Buttons */}
-              <div className="flex flex-wrap gap-3 mb-5">
-                <a
-                  href="https://wa.me/2250575081162"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-1 bg-green-600 hover:bg-green-700 text-white text-md font-medium rounded transition-colors"
-                >
-                  <MessageSquare className="h-4 w-4 mr-3" />
-                  WhatsApp
-                </a>
-                <a
-                  href="tel:+2250160125373"
-                  className="inline-flex items-center px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white text-md font-medium rounded transition-colors"
-                >
-                  <Phone className="h-4 w-4 mr-3" />
-                  Appeler
-                </a>
-              </div>
-
-              {/* Notre Mission */}
-              <div>
-                <h4 className="text-white font-semibold mb-2 text-sm">
-                  Notre Mission
-                </h4>
-                <p className="text-gray-300 text-xs leading-relaxed mb-2">
-                  Démocratiser l'accès aux outils de préparation professionnelle
-                  et accompagner chaque talent vers la réussite.
-                </p>
-              </div>
             </div>
 
-            {/* Fonctionnalités */}
+
+
+            {/* Contact */}
+            <div className="ml-0 sm:ml-16">
+              <h4 className="text-white font-semibold mb-3 text-sm">Contact</h4>
+              <ul className="space-y-2 text-xs text-gray-300">
+                <li className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-[#f1701c]" />
+                  <a href="https://wa.me/2250575081162" target="_blank" rel="noopener noreferrer" className="hover:text-[#f1701c] transition-colors">WhatsApp</a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-[#f1701c]" />
+                  <a href="tel:+2250160125373" className="hover:text-[#f1701c] transition-colors">+225 01 60 12 53 73</a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[#f1701c]" />
+                  <a href="mailto:contact@cvmentor.ai" className="hover:text-[#f1701c] transition-colors">contact@cvmentor.ai</a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-[#f1701c]" />
+                  <span>Abidjan, Côte d'Ivoire</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* CTA */}
             <div>
-              <h4 className="text-white font-semibold mb-3 text-sm">
-                Fonctionnalités
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-blue-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                  <p>Analyse de CV</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-orange-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
-                  <p>Matching CV-Offre</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-purple-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
-                  <p>Simulation d'entretien</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-green-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                  <p>Plan de formation</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-indigo-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
-                  <p>Suivi Candidatures</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-teal-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
-                  <p>Plateformes d'Emploi</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-pink-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-pink-400 rounded-full"></div>
-                  <p>Lettre de Motivation</p>
-                </div>
-                <div className="flex items-center space-x-2 p-2 bg-white/5 rounded hover:bg-white/10 text-gray-300 hover:text-red-400 text-xs transition-colors">
-                  <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
-                  <p>Mode Hors Ligne</p>
-                </div>
-              </div>
+              <h4 className="text-white font-semibold mb-3 text-sm">Prêt à commencer ?</h4>
+              <p className="text-gray-300 text-xs mb-4">Essayez CvMentor AI gratuitement et optimisez vos candidatures.</p>
+              <a
+                href="#features"
+                className="inline-flex items-center justify-center w-full md:w-auto gap-2 bg-white text-[#15679d] px-4 py-2 rounded-md font-bold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+              >
+                Commencer
+                <ArrowRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
           {/* Bottom Section */}
           <div className="border-t border-white/10 pt-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-gray-300 text-xs mb-2 sm:mb-0" translate="no">
                 © {new Date().getFullYear()} CvMentor AI. Tous droits réservés.
               </p>
-              <div className="flex items-center space-x-4">
-                <span className="text-gray-300 text-xs">
-                  Conditions d'utilisations
-                </span>
-                <span className="text-gray-300 text-xs">•</span>
-                <span className="text-gray-300 text-xs">
-                  Termes de confidentialité
-                </span>
+              <div className="flex items-center gap-4">
+                <a href="#" className="text-gray-300 text-xs hover:text-[#f1701c] transition-colors">Conditions d'utilisations</a>
+                <span className="text-gray-500">•</span>
+                <a href="#" className="text-gray-300 text-xs hover:text-[#f1701c] transition-colors">Termes de confidentialité</a>
               </div>
             </div>
           </div>

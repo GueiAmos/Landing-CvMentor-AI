@@ -19,6 +19,7 @@ import {
   Shield,
 } from "lucide-react";
 import logo from "../../assets/logo.png";
+import teamImg from "../../assets/team.png";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 
@@ -79,22 +80,22 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       color: "from-orange-400 to-orange-500",
       bgColor: "orange-700",
     },
-    {
-      icon: <TrendingUp className="h-8 w-8" />,
-      title: "Suivi des candidatures",
-      description:
-        "Organisez et suivez toutes vos candidatures dans un dashboard unifié et intuitif.",
-      color: "from-blue-600 to-blue-700",
-      bgColor: "blue-700",
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Mode Hors Ligne",
-      description:
-        "Accédez à vos données même sans connexion internet pour une utilisation continue.",
-      color: "from-orange-400 to-orange-500",
-      bgColor: "orange-700",
-    },
+    // {
+    //   icon: <TrendingUp className="h-8 w-8" />,
+    //   title: "Suivi des candidatures",
+    //   description:
+    //     "Organisez et suivez toutes vos candidatures dans un dashboard unifié et intuitif.",
+    //   color: "from-blue-600 to-blue-700",
+    //   bgColor: "blue-700",
+    // },
+    // {
+    //   icon: <Shield className="h-8 w-8" />,
+    //   title: "Mode Hors Ligne",
+    //   description:
+    //     "Accédez à vos données même sans connexion internet pour une utilisation continue.",
+    //   color: "from-orange-400 to-orange-500",
+    //   bgColor: "orange-700",
+    // },
   ];
 
   // Bénéfices
@@ -211,10 +212,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                   className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold group-hover:scale-105 transition-all duration-300"
                   translate="no"
                 >
-                  <span className="text-orange-500">C</span>
-                  <span className="text-blue-700">v</span>
-                  <span className="text-orange-500">Mentor</span>
-                  <span className="text-blue-700"> AI</span>
+                  <span className="text-[#f1701c]">C</span>
+                  <span className="text-[#15679d]">v</span>
+                  <span className="text-[#f1701c]">Mentor</span>
+                  <span className="text-[#15679d]"> AI</span>
                 </h1>
               </div>
 
@@ -255,7 +256,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       </section>
 
       {/* Section stats + video illustration responsive */}
-      <section className="w-full py-6 lg:py-10 flex flex-col md:flex-row gap-10 items-center justify-center px-2 sm:px-4 lg:px-14 bg-gradient-to-br from-blue-50 via-white to-orange-50/40">
+      <section className="w-full py-8 lg:py-12 flex flex-col md:flex-row gap-10 items-center justify-center px-2 sm:px-4 lg:px-14 bg-gradient-to-br from-blue-50 via-white to-orange-50/40">
         {/* Bloc stats */}
         <div className="w-full md:w-3/6 flex justify-center grid grid-cols-2 gap-4 md:grid-cols-4 max-w-3xl mx-auto">
           {stats.map((stat, index) => (
@@ -291,21 +292,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Section Fonctionnalités */}
       <section
         id="features"
-        className="py-8 lg:py-12 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
+        className="py-20 lg:py-20 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#15679d] mb-2">
               Tout ce dont vous avez besoin pour réussir
             </h2>
-            <p className="text-xl text-gray-600 md:text-2xl mx-auto">
+            <p className="text-md text-gray-600 md:text-2xl mx-auto">
               Des outils intelligents conçus pour booster votre carrière et
               répondre aux réalités du marché africain
             </p>
           </div>
 
           {/* Fonctionnalités principales */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -333,13 +334,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                 {/* Content */}
                 <div className="relative z-10">
                   <h3
-                    className={`text-${feature.bgColor} text-md font-bold mb-2 group-hover:text-white transition-colors`}
+                    className={`${feature.bgColor.includes('blue') ? 'text-[#15679d]' : feature.bgColor.includes('orange') ? 'text-[#f1701c]' : ''} text-md font-bold mb-2 group-hover:text-white transition-colors`}
                     translate="no"
                   >
                     {feature.title}
                   </h3>
                   <h4
-                    className={`text-${feature.bgColor} text-sm group-hover:text-white transition-colors`}
+                    className={`${feature.bgColor.includes('blue') ? 'text-[#15679d]' : feature.bgColor.includes('orange') ? 'text-[#f1701c]' : ''} text-sm group-hover:text-white transition-colors`}
                     translate="no"
                   >
                     {feature.description}
@@ -359,7 +360,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* Proposition de Valeur */}
       <section
         id="value"
-        className="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-800 py-8 sm:py-8 lg:py-12 relative overflow-hidden"
+        className="bg-[#15679d] py-20 lg:py-20 relative overflow-hidden"
       >
         <div className="absolute inset-0 opacity-10">
           <div
@@ -371,12 +372,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
           ></div>
         </div>
 
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-5 sm:mb-8 lg:mb-10">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">
               Pourquoi choisir CvMentor AI ?
             </h2>
-            <p className="text-sm sm:text-base md:text-lg text-gray-300 max-w-5xl mx-auto px-2">
+            <p className="text-md sm:text-base md:text-lg text-gray-200 max-w-5xl mx-auto px-2">
               Une plateforme pensée pour vous accompagner à chaque étape de
               votre parcours professionnel.
             </p>
@@ -403,7 +404,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
               >
                 {/* Icon container */}
                 <div className="mb-3 flex justify-center">
-                  <div className="w-14 h-14 rounded-lg bg-white flex items-center justify-center text-orange-500 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                  <div className="w-14 h-14 rounded-lg bg-white flex items-center justify-center text-[#f1701c] shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
                     {React.cloneElement(benefit.icon, {
                       className: "w-8 h-8",
                     })}
@@ -441,53 +442,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* À propos de nous */}
       <section
         id="about"
-        className="py-8 lg:py-12 bg-gradient-to-br from-blue-50 via-white to-orange-50 border-t border-b border-blue-100"
+        className="py-20 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-orange-50 border-t border-b border-blue-100"
       >
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-3">
-              À propos de nous
-            </h2>
-            <p className="text-lg text-gray-600 max-w-5xl mx-auto">
-              CvMentor AI est un projet né d'une envie simple : aider chacun à
-              mieux se préparer au monde du travail. Face aux difficultés
-              d'accès à l'emploi, au manque de conseils personnalisés et à la
-              complexité du marché, nous avons créé une plateforme accessible,
-              intelligente et adaptée au contexte local. Notre objectif est de
-              donner à tous les candidats les bons outils pour optimiser leurs
-              chances de décrocher un emploi, progresser dans leur carrière et
-              gagner en confiance.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center text-center border border-blue-100">
-              <BarChart3 className="h-10 w-10 text-orange-500 mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Notre Vision</h3>
-              <p className="text-gray-600 text-md">
-                Aider chacun à mieux se préparer au monde du travail en donnant
-                les bons outils pour comprendre les attentes des recruteurs,
-                améliorer son CV, et décrocher plus facilement un emploi.
-              </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            {/* Texte à gauche */}
+            <div>
+              <div className="mb-4 md:mb-0 text-center sm:text-left">
+                <h2 className="text-3xl md:text-4xl font-bold text-[#15679d] mb-6">
+                  À propos de nous
+                </h2>
+                <p className="text-md sm:text-lg text-gray-600">
+                  CvMentor AI est un projet né d'une envie simple : aider chacun à
+                  mieux se préparer au monde du travail. Face aux difficultés
+                  d'accès à l'emploi, au manque de conseils personnalisés et à la
+                  complexité du marché, nous avons créé une plateforme accessible,
+                  intelligente et adaptée au contexte local. Notre objectif est de
+                  donner à tous les candidats les bons outils pour optimiser leurs
+                  chances de décrocher un emploi, progresser dans leur carrière et
+                  gagner en confiance.
+                </p>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center text-center border border-blue-100">
-              <CheckCircle className="h-10 w-10 text-blue-600 mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Nos Valeurs</h3>
-              <p className="text-gray-600 text-md">
-                Confidentialité, impact social et inclusion sont au cœur de
-                notre approche. Nous utilisons la technologie pour créer des
-                solutions utiles, concrètes et pensées pour répondre aux vrais
-                besoins des chercheurs d'emploi en Afrique.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl shadow p-4 flex flex-col items-center text-center border border-blue-100">
-              <Users className="h-10 w-10 text-orange-500 mb-3" />
-              <h3 className="font-bold text-blue-800 mb-2">Notre Équipe</h3>
-              <p className="text-gray-600 text-md">
-                Nous sommes une équipe motivée, composée de passionnés de
-                technologie et d'éducation, qui connaissent les réalités du
-                terrain et veulent faciliter l'accès à l'emploi grâce à des
-                solutions concrètes.
-              </p>
+
+            {/* Image à droite (passe en bas sur mobile) */}
+            <div className="flex justify-center md:justify-end">
+              <img
+                src={teamImg}
+                alt="L'équipe CvMentor AI"
+                className="w-full max-w-lg md:max-w-xl rounded-2xl shadow-lg border border-blue-100"
+              />
             </div>
           </div>
         </div>
@@ -496,11 +480,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
       {/* FAQ */}
       <section
         id="faq"
-        className="py-8 lg:py-12 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
+        className="py-20 lg:py-20 bg-gradient-to-br from-orange-50 via-white to-blue-50 border-b border-orange-100"
       >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#15679d] mb-2">
               Questions fréquentes
             </h2>
             <p className="text-xl text-gray-600">
@@ -519,18 +503,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                 >
                   <span className="flex items-center gap-2">
                     <span
-                      className="block w-1.5 h-7 rounded bg-blue-600 mr-3"
+                      className="block w-1.5 h-7 rounded bg-[#15679d] mr-3"
                       aria-hidden="true"
                     ></span>
-                    <span className="font-semibold text-gray-900 text-base group-hover:text-orange-500 transition-colors">
+                    <span className="font-semibold text-gray-900 text-base group-hover:text-[#f1701c] transition-colors">
                       {faq.question}
                     </span>
                   </span>
                   <span className="ml-2">
                     {openFaq === index ? (
-                      <ChevronUp className="h-5 w-5 text-orange-400 transition-transform duration-200 rotate-180" />
+                      <ChevronUp className="h-5 w-5 text-[#f1701c] transition-transform duration-200 rotate-180" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400 group-hover:text-orange-400 transition-colors" />
+                      <ChevronDown className="h-5 w-5 text-gray-400 group-hover:text-[#f1701c] transition-colors" />
                     )}
                   </span>
                 </button>
@@ -552,33 +536,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
         </div>
       </section>
 
-      {/* Call-to-Action - Design Minimaliste */}
-      <section
-        id="cta"
-        className="bg-gradient-to-br from-blue-50 via-orange-50 to-white py-10 lg:py-12 border-b border-blue-100"
-      >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Titre simple et impactant */}
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            Prêt à <span className="text-orange-500">commencer</span> ?
-          </h2>
-
-          {/* Description courte */}
-          <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto">
-            Rejoignez des milliers d'utilisateurs qui ont déjà transformé leur
-            carrière
-          </p>
-
-          {/* Bouton principal unique */}
-          <button
-            onClick={onStartApp}
-            className="group bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl font-bold text-md shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3 mx-auto"
-          >
-            <span>Commencer gratuitement</span>
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </section>
+      
 
       {/* Pied de page */}
       <Footer />

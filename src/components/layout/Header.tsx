@@ -10,24 +10,24 @@ const Header: React.FC = () => {
     { id: "value", label: "Pourquoi CvMentor AI ?" },
     { id: "about", label: "À propos" },
     { id: "faq", label: "FAQ" },
-    { id: "cta", label: "Commencer" },
+    { id: "", label: "Commencer" },
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-[75px]">
         {/* Logo + slogan */}
         <div className="flex items-center gap-2">
           <img src={logo} alt="CvMentor AI Logo" className="w-12 h-11" />
           <div>
             <span
-              className="font-bold text-xl sm:text-xl text-blue-800"
+              className="font-bold text-xl sm:text-xl text-[#15679d]"
               translate="no"
             >
-              <span className="text-orange-500">C</span>
-              <span className="text-blue-600">v</span>
-              <span className="text-orange-500">Mentor</span>
-              <span className="text-blue-600"> AI</span>
+              <span className="text-[#f1701c]">C</span>
+              <span className="text-[#15679d]">v</span>
+              <span className="text-[#f1701c]">Mentor</span>
+              <span className="text-[#15679d]"> AI</span>
             </span>{" "}
             <p className="text-xs text-gray-600 font-semibold">
               Optimisez votre candidature
@@ -41,7 +41,7 @@ const Header: React.FC = () => {
             <a
               key={section.id}
               href={`#${section.id}`}
-              className="text-gray-700 hover:text-orange-500 font-medium px-2 py-1 rounded transition-colors duration-150 text-sm"
+              className="text-gray-700 hover:text-[#f1701c] font-medium px-2 py-1 rounded transition-colors duration-150 text-sm"
             >
               {section.label}
             </a>
@@ -66,7 +66,7 @@ const Header: React.FC = () => {
             {mobileMenuOpen ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 text-orange-500"
+                className="h-6 w-6 text-[#f1701c]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -100,27 +100,27 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 w-full bg-white/95 shadow-lg border-b border-gray-100 animate-fade-in z-50">
+        <div className="md:hidden absolute left-0 w-full bg-white/95 shadow-lg border-b border-gray-100 animate-fade-in z-50">
           <div className="flex flex-col py-2 px-4 gap-2">
             {NAV_SECTIONS.slice(0, -1).map((section) => (
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                className="text-gray-800 hover:text-orange-500 font-semibold px-2 py-3 rounded transition-colors duration-150 text-base border-b border-gray-100"
+                className="text-gray-800 hover:text-[#f1701c] font-semibold px-2 py-3 rounded transition-colors duration-150 text-base border-b border-gray-100"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {section.label}
               </a>
             ))}
             {/* Distinct orange button for 'Commencer' */}
-            <a
+            {/* <a
               key={NAV_SECTIONS[NAV_SECTIONS.length - 1].id}
               href={`#${NAV_SECTIONS[NAV_SECTIONS.length - 1].id}`}
               className="mt-2 px-4 py-3 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-base shadow transition-colors duration-150 text-center"
               onClick={() => setMobileMenuOpen(false)}
             >
               {NAV_SECTIONS[NAV_SECTIONS.length - 1].label}
-            </a>
+            </a> */}
           </div>
         </div>
       )}
