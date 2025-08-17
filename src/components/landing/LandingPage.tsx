@@ -22,6 +22,12 @@ import logo from "../../assets/logo.png";
 import teamImg from "../../assets/team.png";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
+import imgAnalyse from "../../assets/analyse.png";
+import imgMatching from "../../assets/matching.png";
+import imgLettre from "../../assets/lettre.png";
+import imgSimulation from "../../assets/simulation.png";
+import imgCompetence from "../../assets/competence.png";
+import imgEmploi from "../../assets/emploi.png";
 
 interface LandingPageProps {
   onStartApp: () => void;
@@ -69,13 +75,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     },
     {
       icon: <BookOpen className="h-8 w-8" />,
-      title: "Plan de formation",
+      title: "Recommandations de formation",
       description:
         "Recevez des recommandations personnalisées de ressources de formation pour améliorer vos compétences nécessaires.",
       color: "from-blue-600 to-blue-700",
       bgColor: "blue-700",
     },
-
     {
       icon: <Briefcase className="h-8 w-8" />,
       title: "Plateformes d'offres d'emploi",
@@ -102,6 +107,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     // },
   ];
 
+  // Images d'aperçu pour la vue desktop (une par fonctionnalité)
+  const featureImages = [
+    imgAnalyse, // Analyse de CV
+    imgMatching, // Matching CV-Offre
+    imgLettre, // Lettre de motivation
+    imgSimulation, // Simulation d'entretien
+    imgCompetence, // Plan de formation (placeholder)
+    imgEmploi, // Plateformes d'offres d'emploi (placeholder)
+  ];
+
   // Sync active feature with mobile horizontal scroll position
   const handleMobileScroll = () => {
     const el = mobileCarouselRef.current;
@@ -115,7 +130,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     if (clamped !== activeFeature) setActiveFeature(clamped);
   };
 
-  // Auto-scroll mobile carousel every 3s
+  // Auto-scroll mobile carousel every 4s
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -133,13 +148,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
           el.scrollTo({ left: next * slideW, behavior: "smooth" });
           return next;
         });
-      }, 3000);
+      }, 4000);
       return () => clearInterval(interval);
     }
   }, [features.length]);
   // (features moved above to avoid use-before-declaration)
 
-  // Auto-rotation des fonctionnalités (toutes les 4s) – désactivée sur mobile
+  // Auto-rotation des fonctionnalités (toutes les 5s) – désactivée sur mobile
   useEffect(() => {
     // Désactiver l'auto-rotation sur mobile (md breakpoint Tailwind ~ 768px)
     if (
@@ -151,7 +166,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     }
     const id = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 15000);
+    }, 5000);
     return () => clearInterval(id);
   }, [features.length]);
 
@@ -409,8 +424,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                     <div className="relative z-10">
                       <h3 className="text-xl font-bold text-gray-900 mb-2" translate="no">{f.title}</h3>
                       <p className="text-gray-600 text-sm mb-4" translate="no">{f.description}</p>
-                      <div className="w-full aspect-[3/4] rounded-lg bg-white/90 border border-gray-200 shadow flex items-center justify-center">
-                        <span className="text-xs text-gray-500 text-center">Aperçu</span>
+                      <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-white border border-gray-200 shadow">
+                        <img
+                          src={featureImages[idx]}
+                          alt={`Aperçu ${f.title}`}
+                          className="w-full h-full object-contain"
+                        />
                       </div>
                     </div>
                   </div>
@@ -492,8 +511,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                   />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-5 md:grid-cols-5 gap-6 items-start">
-                  <div className="md:col-span-3">
+                <div className="relative z-10 flex flex-col items-start">
+                  <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#15679d]/10 text-[#15679d] text-xs font-semibold mb-3" translate="no">
                       {features[activeFeature].title}
                     </div>
@@ -503,15 +522,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                     <p className="text-gray-600 md:text-lg mb-5" translate="no">
                       {features[activeFeature].description}
                     </p>
-                    <button className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-[#15679d] text-white font-semibold text-sm hover:bg-[#135986] transition-colors">
-                      Découvrir
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
                   </div>
-                  {/* Mock preview card */}
-                  <div className="md:col-span-2">
-                    <div className="w-full aspect-[3/4] rounded-xl bg-white/90 border border-gray-200 shadow-lg flex items-center justify-center">
-                      <span className="text-sm text-center text-gray-500">Aperçu</span>
+                  {/* Aperçu image (desktop uniquement) */}
+                  <div className="w-full">
+                    <div className="mx-auto aspect-[16/9] rounded-xl overflow-hidden border border-gray-200 shadow-lg bg-white">
+                      <img
+                        src={featureImages[activeFeature]}
+                        alt={`Aperçu ${features[activeFeature].title}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
                 </div>
