@@ -36,7 +36,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex gap-2 items-center">
+        <div className="hidden lg:flex gap-2 items-center">
           {NAV_SECTIONS.slice(0, -1).map((section) => (
             <a
               key={section.id}
@@ -57,7 +57,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Mobile Hamburger */}
-        <div className="md:hidden flex items-center">
+        <div className="lg:hidden flex items-center">
           <button
             aria-label="Ouvrir le menu"
             className="p-2 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -100,7 +100,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute left-0 w-full bg-white/95 shadow-lg border-b border-gray-100 animate-fade-in z-50">
+        <div className="lg:hidden absolute left-0 w-full bg-white/95 shadow-lg border-b border-gray-100 animate-fade-in z-50">
           <div className="flex flex-col py-2 px-4 gap-2">
             {NAV_SECTIONS.slice(0, -1).map((section) => (
               <a

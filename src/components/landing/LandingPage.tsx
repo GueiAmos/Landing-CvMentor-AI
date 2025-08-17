@@ -151,7 +151,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     }
     const id = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 4000);
+    }, 15000);
     return () => clearInterval(id);
   }, [features.length]);
 
@@ -407,10 +407,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                       />
                     </div>
                     <div className="relative z-10">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{f.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4">{f.description}</p>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2" translate="no">{f.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4" translate="no">{f.description}</p>
                       <div className="w-full aspect-[3/4] rounded-lg bg-white/90 border border-gray-200 shadow flex items-center justify-center">
-                        <span className="text-xs text-gray-500">Aperçu {f.title}</span>
+                        <span className="text-xs text-gray-500 text-center">Aperçu</span>
                       </div>
                     </div>
                   </div>
@@ -442,7 +442,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-gray-100 h-full">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[11px] tracking-widest text-gray-500 font-semibold">
-                    PROGRÈS
+                    FONCTIONNALITES
                   </span>
                 </div>
                 <ul className="space-y-2">
@@ -492,15 +492,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                   />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                  <div className="lg:col-span-2">
+                <div className="relative z-10 grid grid-cols-5 md:grid-cols-5 gap-6 items-start">
+                  <div className="md:col-span-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#15679d]/10 text-[#15679d] text-xs font-semibold mb-3" translate="no">
                       {features[activeFeature].title}
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                    <h3 className="text-2xl md:text-2xl font-bold text-gray-900 mb-3" translate="no">
                       {features[activeFeature].title}
                     </h3>
-                    <p className="text-gray-600 md:text-lg mb-5">
+                    <p className="text-gray-600 md:text-lg mb-5" translate="no">
                       {features[activeFeature].description}
                     </p>
                     <button className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-[#15679d] text-white font-semibold text-sm hover:bg-[#135986] transition-colors">
@@ -509,9 +509,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                     </button>
                   </div>
                   {/* Mock preview card */}
-                  <div className="lg:col-span-1">
+                  <div className="md:col-span-2">
                     <div className="w-full aspect-[3/4] rounded-xl bg-white/90 border border-gray-200 shadow-lg flex items-center justify-center">
-                      <span className="text-sm text-gray-500">Aperçu {features[activeFeature].title}</span>
+                      <span className="text-sm text-center text-gray-500">Aperçu</span>
                     </div>
                   </div>
                 </div>
@@ -616,7 +616,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                 <h2 className="text-3xl md:text-4xl font-bold text-[#15679d] mb-6">
                   À propos de nous
                 </h2>
-                <p className="text-md sm:text-lg text-gray-600">
+                <p className="text-md sm:text-md text-gray-600">
                   CvMentor AI est un projet né d'une envie simple : aider chacun à
                   mieux se préparer au monde du travail. Face aux difficultés
                   d'accès à l'emploi, au manque de conseils personnalisés et à la
@@ -684,8 +684,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                 </button>
                 <div
                   className={`transition-all duration-300 ease-in-out ${openFaq === index
-                      ? "max-h-40 opacity-100 py-2 px-7"
-                      : "max-h-0 opacity-0 py-0 px-7"
+                    ? "max-h-40 opacity-100 py-2 px-7"
+                    : "max-h-0 opacity-0 py-0 px-7"
                     } overflow-hidden bg-white/90`}
                   style={{}}
                 >
