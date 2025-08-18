@@ -17,6 +17,7 @@ import {
   Globe,
   Zap,
   Shield,
+  X,
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 import teamImg from "../../assets/team.png";
@@ -38,6 +39,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [pauseRotation, setPauseRotation] = useState(false);
   const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   // Fonctionnalités principales
   const features = [
@@ -129,6 +131,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     const clamped = Math.max(0, Math.min(idx, features.length - 1));
     if (clamped !== activeFeature) setActiveFeature(clamped);
   };
+
+  // Gestion Lightbox (fermeture via ESC)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Auto-scroll mobile carousel every 4s
   useEffect(() => {
@@ -424,13 +435,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                     <div className="relative z-10">
                       <h3 className="text-xl font-bold text-gray-900 mb-2" translate="no">{f.title}</h3>
                       <p className="text-gray-600 text-sm mb-4" translate="no">{f.description}</p>
-                      <div className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-white border border-gray-200 shadow">
+                      <button
+                        type="button"
+                        onClick={() => setLightbox({ src: featureImages[idx], alt: `Aperçu ${f.title}` })}
+                        className="w-full aspect-[16/9] rounded-lg overflow-hidden bg-white border border-gray-200 shadow cursor-zoom-in"
+                        aria-label={`Agrandir l'aperçu de ${f.title}`}
+                      >
                         <img
                           src={featureImages[idx]}
                           alt={`Aperçu ${f.title}`}
                           className="w-full h-full object-contain"
                         />
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -525,13 +541,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
                   </div>
                   {/* Aperçu image (desktop uniquement) */}
                   <div className="w-full">
-                    <div className="mx-auto aspect-[16/9] rounded-xl overflow-hidden border border-gray-200 shadow-lg bg-white">
+                    <button
+                      type="button"
+                      onClick={() => setLightbox({ src: featureImages[activeFeature], alt: `Aperçu ${features[activeFeature].title}` })}
+                      className="w-full md:max-w-2xl mx-auto aspect-[16/9] rounded-xl overflow-hidden border border-gray-200 shadow-lg bg-white cursor-zoom-in"
+                      aria-label={`Agrandir l'aperçu de ${features[activeFeature].title}`}
+                    >
                       <img
                         src={featureImages[activeFeature]}
                         alt={`Aperçu ${features[activeFeature].title}`}
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -659,6 +680,36 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
           </div>
         </div>
       </section>
+
+      {/* Lightbox modal */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[100]"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="absolute inset-0 bg-black/80" />
+          <div
+            className="relative z-10 h-full w-full flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setLightbox(null)}
+              className="absolute top-5 right-5 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2"
+              aria-label="Fermer l'aperçu"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            <img
+              src={lightbox.src}
+              alt={lightbox.alt}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       {/* FAQ */}
       <section
