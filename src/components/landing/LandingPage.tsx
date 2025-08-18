@@ -29,6 +29,7 @@ import imgLettre from "../../assets/lettre.png";
 import imgSimulation from "../../assets/simulation.png";
 import imgCompetence from "../../assets/competence.png";
 import imgEmploi from "../../assets/emploi.png";
+import promoVideo from "../../assets/video.mp4";
 
 interface LandingPageProps {
   onStartApp: () => void;
@@ -40,6 +41,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
   const [pauseRotation, setPauseRotation] = useState(false);
   const mobileCarouselRef = useRef<HTMLDivElement | null>(null);
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const promoVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Fonctionnalités principales
   const features = [
@@ -139,6 +141,41 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Essaie de lancer la vidéo avec son à l'arrivée (selon politiques navigateur)
+  useEffect(() => {
+    const v = promoVideoRef.current;
+    if (!v) return;
+    const tryPlay = () => {
+      v.muted = false;
+      v.volume = 1;
+      v.play().catch(() => {});
+    };
+    tryPlay();
+
+    const resume = () => {
+      const vv = promoVideoRef.current;
+      if (!vv) return;
+      vv.muted = false;
+      vv.volume = 1;
+      vv.play().catch(() => {});
+      document.removeEventListener("pointerdown", resume);
+      document.removeEventListener("keydown", resume);
+      document.removeEventListener("touchstart", resume);
+      document.removeEventListener("click", resume);
+    };
+    document.addEventListener("pointerdown", resume, { once: true });
+    document.addEventListener("keydown", resume, { once: true });
+    document.addEventListener("touchstart", resume, { once: true });
+    document.addEventListener("click", resume, { once: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", resume);
+      document.removeEventListener("keydown", resume);
+      document.removeEventListener("touchstart", resume);
+      document.removeEventListener("click", resume);
+    };
   }, []);
 
   // Auto-scroll mobile carousel every 4s
@@ -360,13 +397,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartApp }) => {
         <div className="w-full md:w-3/6 flex justify-center">
           <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-white/90">
             <div className="relative pb-[56.25%] h-0">
-              <iframe
+              <video
+                ref={promoVideoRef}
                 className="absolute top-0 left-0 w-full h-full rounded-2xl"
-                src="https://www.youtube.com/embed/SEIDyEpFoas?si=H7-Vafh3j09ZI2fx"
-                title="Présentation CvMentor AI"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              ></iframe>
+                src={promoVideo}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                onLoadedMetadata={() => {
+                  if (promoVideoRef.current) {
+                    promoVideoRef.current.volume = 1;
+                  }
+                }}
+              />
             </div>
           </div>
         </div>
